@@ -1,0 +1,27 @@
+<br><br><br>
+
+<section class="post custom-post-section">
+  <h2>{{ post?.title }}</h2>
+  <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
+  <h3>{{ post?.description }}</h3>
+
+  <!-- Comment Section -->
+  <form (ngSubmit)="onAddComment(commentInput.value)">
+    <label class="font-weight-bold">Comments</label>
+    <div *ngFor="let comment of comments">Stranger: {{ comment }}
+    </div><br>
+    <input #commentInput type="text" class="form-control" placeholder="comment" />
+    <br /><button type="submit">Add Comment</button>
+  </form>
+  <hr>
+
+  <div class="button-container">
+    <button (click)="onEdit()">Edit</button> |
+    <button (click)="delete()">Delete</button>
+  </div>
+<br><br>
+  <div class ="auto">
+  <p>Author: {{ post?.author }}</p>
+  <p>Date: {{ post?.dateCreated | date }}</p>
+  </div>
+</section>

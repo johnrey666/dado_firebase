@@ -1,1 +1,22 @@
-/* You can add global styles to this file, and also import other style files */
+
+body.dark-mode {
+    background-color: #1b1e21;
+    color: #ffffff;
+  }
+  
+  .navbar-dark .navbar-nav .nav-link {
+    color: #ffffff !important;
+  }
+  
+  .post {
+    
+    background-color: #ffffff; 
+    color: #000000; 
+  }
+  
+  body.dark-mode .post {
+  
+    background-color: #b4b4b4; 
+    color: #ffffff; 
+  }
+  

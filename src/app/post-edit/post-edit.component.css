@@ -1,0 +1,39 @@
+
+form {
+  margin: 0% 10% 10% 10%;
+  padding: 20px;
+  border: 1px solid #ddd; 
+  border-radius: 10px; 
+  width: 50%;
+}
+
+
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border: 1px solid orangered;
+}
+
+
+.form-label {
+  color: #333; 
+}
+
+
+.btn-primary,
+.btn-danger {
+  width: 10%; 
+}
+
+
+.form-outline {
+  margin-bottom: 10px;
+}
+
+/* Style the image preview */
+img {
+  max-width: 100%; 
+  height: auto;
+  border: 1px solid #ddd; 
+  border-radius: 5px; 
+  margin-top: 10px; 
+}

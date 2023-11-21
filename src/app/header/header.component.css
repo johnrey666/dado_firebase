@@ -1,0 +1,9 @@
+button {
+    opacity: 1;
+  }
+  
+  button:active {
+    opacity: 0.5;
+  }
+  
+  
