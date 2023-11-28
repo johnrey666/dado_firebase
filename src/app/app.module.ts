@@ -10,6 +10,7 @@ import { PostListComponent } from './post-list/post-list.component';
 import {Routes} from '@angular/router';
 import {RouterModule} from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { HighlightPipe } from './highlight.pipe';
 
 
 
@@ -31,6 +32,7 @@ const routes : Routes = [
     PostComponent,
     PostEditComponent,
     PostListComponent,
+    HighlightPipe,
 
   ],
   imports: [

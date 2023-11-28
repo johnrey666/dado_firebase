@@ -1,33 +1,63 @@
 import { EventEmitter, Injectable } from "@angular/core";
 import { Post } from "./post.model";
 import { HttpClient } from "@angular/common/http";
+import { map } from 'rxjs/operators'
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
   constructor(private http:HttpClient){}
   listChangedEvent: EventEmitter<Post[]> = new EventEmitter();
-  postCreated = new EventEmitter<string>();
+  postCreated = new EventEmitter<Post>();
+  postDeleted = new EventEmitter<string>();
+  notificationCreated = new EventEmitter<{title: string, date: string, time: string}>(); // New event emitter for notifications
   listOfPosts: Post[] = [];
+  notifications: {title: string, date: string, time: string}[] = [];
+
+  addNotification(post: Post) {
+    const date = post.dateCreated.toLocaleDateString(); // Format the date
+    const time = post.dateCreated.toLocaleTimeString(); // Format the time
+    const notification = {title: `You have posted "${post.title}"`, date, time};
+    this.notifications.push(notification);
+    return notification; // Return the new notification
+  }
+  
+  addDeleteNotification(post: Post) {
+    const date = new Date().toLocaleDateString(); // Format the date
+    const time = new Date().toLocaleTimeString(); // Format the time
+    const notification = {title: `You deleted "${post.title}"`, date, time};
+    this.notifications.push(notification);
+    return notification; // Return the new notification
+  }
+  getNotifications() { // Added getNotifications method
+    return this.notifications;
+    // Here you can add code to retrieve the notifications array from the backend
+  }
 
   getPost() {
     return this.listOfPosts;
   }
 
   deleteButton(index: number) {
+    const deletedPost = this.listOfPosts[index];
     this.http.delete(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`).subscribe(() => {
       console.log('Post deleted from Firebase');
       this.listOfPosts.splice(index, 1);
+      const notification = this.addDeleteNotification(deletedPost); // Get the new notification
+      this.notificationCreated.emit(notification); // Emit the new notification
     });
   }
-
   addPost(post: Post) {
     this.listOfPosts.push(post);
-    this.postCreated.emit(`You have posted "${post.title}" on ${new Date().toLocaleDateString()}`);
+    this.postCreated.emit(post); // Emit the new post
+    const notification = this.addNotification(post); // Get the new notification
+    this.notificationCreated.emit(notification); // Emit the new notification
   }
 
   updatePost(index: number, post: Post) {
     this.listOfPosts[index] = post;
   }
+
+
 
   getSpecPost(index: number) {
     return this.listOfPosts[index];
@@ -73,4 +103,6 @@ export class PostService {
         console.log('Comment deleted from Firebase');
       });
   }
+
+  
 }

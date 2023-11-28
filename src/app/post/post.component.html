@@ -2,10 +2,9 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 <section class="post custom-post-section">
-  <h2>{{ post?.title }}</h2>
+  <h2 [innerHTML]="(post?.title ?? '') | highlight:searchTerm"></h2>
   <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
-  <h3>{{ post?.description }}</h3>
-
+  <h3 [innerHTML]="(post?.description ?? '') | highlight:searchTerm"></h3>
   <p>
     <button type="button" (click)="onLike()" style="background: none; text-decoration: none; font-size: 24px; color: red; border: none;" class="far fa-heart"></button>&nbsp;{{ post?.numberOfLikes }}
     
