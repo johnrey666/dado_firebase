@@ -12,6 +12,7 @@ import {RouterModule} from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 
 
+
 const routes : Routes = [
 { path: '', redirectTo: 'post-list', pathMatch: 'full'},
 { path: 'post-list', component: PostListComponent},

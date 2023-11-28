@@ -50,4 +50,19 @@ form {
     color: blue;
 }
 
+.edit{
+    background-color: green;
+    border-radius: 30%;
+}
+
+.delete{
+    background-color: red;
+    border-radius: 30%;
+}
+
+.addcom{
+    background-color: blue;
+    border-radius: 10%;
+    color: white;
+}
   

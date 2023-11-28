@@ -1,23 +1,35 @@
 <br><br><br>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
 <section class="post custom-post-section">
   <h2>{{ post?.title }}</h2>
   <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
   <h3>{{ post?.description }}</h3>
 
+  <p>
+    <button type="button" (click)="onLike()" style="background: none; text-decoration: none; font-size: 24px; color: red; border: none;" class="far fa-heart"></button>&nbsp;{{ post?.numberOfLikes }}
+    
+  </p>
   <!-- Comment Section -->
   <form (ngSubmit)="onAddComment(commentInput.value)">
     <label class="font-weight-bold">Comments</label>
-    <div *ngFor="let comment of comments">Stranger: {{ comment }}
+    <div *ngFor="let comment of comments; let i = index">
+      Stranger: {{ comment }}
+      <button *ngIf="editingCommentIndex !== i" (click)="onEditComment(i)" style="border: none; color: blue;"><i class="fas fa-edit"></i></button>
+      <button (click)="onDeleteComment(i)" style="border: none; color: red;"><i class="fas fa-trash"></i></button>
+      <div *ngIf="editingCommentIndex === i">
+        <input #newCommentInput type="text" [value]="comment" />
+        <button (click)="onSaveComment(newCommentInput.value)" style="border: none; color: green;"><i class="fas fa-save"></i></button>
+      </div>
     </div><br>
     <input #commentInput type="text" class="form-control" placeholder="comment" />
-    <br /><button type="submit">Add Comment</button>
+    <br /><button class="addcom" type="submit">Add Comment</button>
   </form>
   <hr>
 
   <div class="button-container">
-    <button (click)="onEdit()">Edit</button> |
-    <button (click)="delete()">Delete</button>
+    <button class="edit" (click)="onEdit()">Edit</button> |
+    <button class="delete" (click)="delete()">Delete</button>
   </div>
 <br><br>
   <div class ="auto">

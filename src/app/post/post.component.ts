@@ -45,4 +45,25 @@ export class PostComponent implements OnInit {
     this.postService.addComment(this.index, comment);
     this.comments = this.postService.getComments(this.index); // Refresh the comments
   }
+
+  onEditComment(index: number) {
+    this.editingCommentIndex = index;
+  }
+  editingCommentIndex: number | null = null;
+  
+  onSaveComment(newComment: string) {
+    if (this.editingCommentIndex !== null) {
+      this.postService.editComment(this.index, this.editingCommentIndex, newComment);
+      this.comments = this.postService.getComments(this.index); // Refresh the comments
+      this.editingCommentIndex = null;
+    }
+  }
+  
+  onDeleteComment(index: number) {
+    const confirmDelete = window.confirm('Are you sure you want to delete this comment?');
+    if (confirmDelete) {
+      this.postService.deleteComment(this.index, index);
+      this.comments = this.postService.getComments(this.index); // Refresh the comments
+    }
+  }
 }
