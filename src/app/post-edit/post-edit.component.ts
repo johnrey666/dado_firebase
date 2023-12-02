@@ -38,11 +38,12 @@ export class PostEditComponent implements OnInit {
     });
   }
   onSubmit() {
+    const id = this.form.value.id; // get id from form
     const title = this.form.value.title;
     const imgPath = this.form.value.imgPath;
     const description = this.form.value.description;
     const post: Post = new Post(
-      title, imgPath, description, 'Dado', new Date(), 0
+     id, title, imgPath, description, 'Dado', new Date(), 0
     );
     if (this.editMode == true) {
       this.postService.updatePost(this.index, post);

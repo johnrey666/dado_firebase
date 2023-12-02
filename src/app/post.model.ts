@@ -1,6 +1,6 @@
 export class Post {
     constructor (
-
+        public id: string, // or number, depending on what type the id should be
         public title: string, 
         public imgPath: string, 
         public description: string, 
@@ -8,6 +8,5 @@ export class Post {
         public dateCreated: Date,
         public numberOfLikes: number,
         public comments: string[] = [] ) {
-
     }
 }

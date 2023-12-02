@@ -1,10 +1,10 @@
-// header.component.ts
-
 import { Component, OnInit } from '@angular/core';
 import { BackEndService } from '../back-end.service';
 import { PostService } from '../post.service';
 import { DarkModeService } from '../dark-mode.service'; // Import the DarkModeService
 import { Post } from '../post.model';
+import { ViewChild, ElementRef } from '@angular/core';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-header',
@@ -15,13 +15,17 @@ export class HeaderComponent implements OnInit {
   searchTerm: string = '';
   dropdownOpen: boolean = false;
   notifications: string[] = [];
+  @ViewChild('recycleBinModal') recycleBinModal!: ElementRef;
+  user$ = this.authService.user$;
 
-  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService) {} 
+  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService) {} 
 
+  deletedPosts: Post[] = [];
   ngOnInit(): void {
+    
     this.backendservice.fetchData();
     this.postService.notificationCreated.subscribe((notification: {title: string, date: string, time: string}) => { // Subscribe to the notificationCreated event
-      this.onNewPostCreated(notification); // Call onNewPostCreated when a new notification is created
+      this.onNewPostCreated(notification);
     });
   }
 
@@ -51,11 +55,11 @@ export class HeaderComponent implements OnInit {
   }
 
   openRecycleBinModal() {
-    // Code to open the recycle bin modal
+    this.recycleBinModal.nativeElement.style.display = 'block';
   }
   
   closeRecycleBinModal() {
-    // Code to close the recycle bin modal
+    this.recycleBinModal.nativeElement.style.display = 'none';
   }
   
 

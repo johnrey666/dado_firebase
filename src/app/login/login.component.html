@@ -1,0 +1,16 @@
+<div class="login-box">
+    <h2>Login</h2>
+    <!-- login.component.html -->
+    <form>
+        <div class="user-box">
+            <input type="text" name="email" required="" [(ngModel)]="email"> 
+            <label>Email</label>
+        </div>
+        <div class="user-box">
+            <input type="password" name="password" required="" [(ngModel)]="password">
+            <label>Password</label>
+        </div>
+        <button type="submit" (click)="signIn($event)">Sign In</button>
+    </form><br>
+    <p><a routerLink="/signup" style="text-decoration: underline;">Sign Up Here</a></p>
+</div>
