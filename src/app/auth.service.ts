@@ -21,6 +21,10 @@ export class AuthService {
       this._user$.next(user);});
   }
 
+  public getIdToken() {
+    return this.firebaseAuth.idToken;
+  }
+
   async login(email: string, password: string): Promise<User | null> {
     try {
       console.log('Logging in with email:', email);
@@ -42,15 +46,18 @@ export class AuthService {
     }
   }
   
+  
+  public updateUserData(user: User | null) {
+    this._user$.next(user);
+  }
 
   signUp(email: string, password: string) {
-    return this.firebaseAuth.createUserWithEmailAndPassword(email, password).then(() => {
-      return this.firebaseAuth.signOut();
-    });
+    return this.firebaseAuth.createUserWithEmailAndPassword(email, password);
   }
 
   async signOut() {
     await this.firebaseAuth.signOut();
+    this._user$.next(null); // Add this line
   }
 
   getCurrentUser() {

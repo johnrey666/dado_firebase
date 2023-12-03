@@ -23,6 +23,7 @@ export class SignUpComponent {
       console.log(this.email)
     }).catch(error => {
       console.error('Error during sign up:', error);
+      alert('Sign up failed. Please try again.'); // display an alert
     });
   }
-}
+} 
