@@ -16,6 +16,7 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import { environment } from 'src/environments/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AuthGuard } from './auth.guard';
+import { NoAuthGuard } from './noauth.guard'; // import NoAuthGuard
 
 const routes: Routes = [
   { path: '', redirectTo: 'post-list', pathMatch: 'full' },
@@ -24,8 +25,8 @@ const routes: Routes = [
   { path: 'Authentication', component: AuthComponent },
   { path: 'post-edit', component: PostEditComponent, canActivate: [AuthGuard] },
   { path: 'post-edit/:index', component: PostEditComponent, canActivate: [AuthGuard] },
-  { path: 'login', component: SignInComponent },
-  { path: 'signup', component: SignUpComponent },
+  { path: 'login', component: SignInComponent, canActivate: [NoAuthGuard] }, // use NoAuthGuard
+  { path: 'signup', component: SignUpComponent, canActivate: [NoAuthGuard] }, // use NoAuthGuard
 ]
 
 @NgModule({
@@ -48,7 +49,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [AuthGuard],
+  providers: [AuthGuard, NoAuthGuard], // add NoAuthGuard to providers
   bootstrap: [AppComponent]
 })
 export class AppModule { }

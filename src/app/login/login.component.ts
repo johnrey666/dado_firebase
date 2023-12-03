@@ -29,6 +29,7 @@ export class SignInComponent {
       }
     }).catch(error => {
       console.error('Error during sign in:', error);
+      alert('Incorrect username or password'); // display an alert
     });
   }
 }

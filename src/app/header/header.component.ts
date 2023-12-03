@@ -5,6 +5,7 @@ import { DarkModeService } from '../dark-mode.service'; // Import the DarkModeSe
 import { Post } from '../post.model';
 import { ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header',
@@ -18,7 +19,8 @@ export class HeaderComponent implements OnInit {
   @ViewChild('recycleBinModal') recycleBinModal!: ElementRef;
   user$ = this.authService.user$;
 
-  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService) {} 
+
+constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router) {} 
 
   deletedPosts: Post[] = [];
   ngOnInit(): void {
@@ -62,5 +64,11 @@ export class HeaderComponent implements OnInit {
     this.recycleBinModal.nativeElement.style.display = 'none';
   }
   
+  logout() {
+    this.authService.signOut().then(() => {
+      
+      this.router.navigate(['/login']);
+    });
+  }
 
 }
