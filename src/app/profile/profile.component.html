@@ -5,10 +5,9 @@
             <div class="px-4 pt-0 pb-4 cover"> 
                 <div class="media align-items-end profile-head"> 
                     <div class="profile mr-3">
-                        <img [src]="user?.photoURL || 'default-image-url'" alt="..." width="130" class="rounded mb-2 img-thumbnail">
+                        <img [src]="user?.photoURL || 'default-image-url'" alt="..." class="rounded mb-2 img-thumbnail">
                         <input type="file" (change)="onFileSelected($event)">
                         <button (click)="onUpload()">Upload</button>
-    
                     </div> 
                     <div class="media-body mb-5 text-white"> 
                         <h4 class="mt-0 mb-0">{{ user?.email }}</h4> 
@@ -20,6 +19,48 @@
                 <div class="d-flex align-items-center justify-content-between mb-3"> 
                     <h5 class="mb-0">Posts</h5>
                 </div> 
+                <!-- Display posts -->
+                <div *ngFor="let post of userPosts; let i = index">
+                    <br><br><br>
+                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+                    
+                    <section class="post custom-post-section">
+                      <p>Posted by: {{ post?.postedBy }}</p>
+                        <h2 [innerHTML]="(post?.title ?? '') | highlight:searchTerm"></h2>
+                      <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
+                      <h3 [innerHTML]="(post?.description ?? '') | highlight:searchTerm"></h3>
+                      <p>
+                        <button type="button" (click)="onLike(i)" style="background: none; text-decoration: none; font-size: 24px; color: red; border: none;" class="far fa-heart"></button>&nbsp;{{ post?.numberOfLikes }}
+                        
+                      </p>
+                      <!-- Comment Section -->
+                      <form (ngSubmit)="onAddComment(i, commentInput.value)">
+                        <label class="font-weight-bold">Comments</label>
+                        <div *ngFor="let comment of post?.comments; let j = index">
+                          Stranger: {{ comment }}
+                          <button *ngIf="editingCommentIndex !== j" (click)="onEditComment(j)" style="border: none; color: blue;"><i class="fas fa-edit"></i></button>
+                          <button (click)="onDeleteComment(i, j)" style="border: none; color: red;"><i class="fas fa-trash"></i></button>
+                          <div *ngIf="editingCommentIndex === j">
+                            <input #newCommentInput type="text" [value]="comment" />
+                            <button (click)="onSaveComment(i, j, newCommentInput.value)" style="border: none; color: green;"><i class="fas fa-save"></i></button>
+                          </div>
+                        </div><br>
+                        <input #commentInput type="text" class="form-control" placeholder="comment" />
+                        <br /><button class="addcom" type="submit">Add Comment</button>
+                      </form>
+                      <hr>
+                    
+                      <div class="button-container">
+                        <button class="edit" (click)="onEdit(i)">Edit</button> |
+                        <button class="delete" (click)="delete(i)">Delete</button>
+                      </div>
+                    <br><br>
+                      <div class ="auto">
+                      <p>Author: {{ post?.author }}</p>
+                      <p>Date: {{ post?.dateCreated | date }}</p>
+                      </div>
+                    </section><hr>
+                </div>
             </div> 
         </div> 
     </div>

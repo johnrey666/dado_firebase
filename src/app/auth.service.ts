@@ -5,6 +5,7 @@ import { User, UserInfo  } from 'firebase/auth';
 import { map } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { getAuth } from "firebase/auth";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +16,11 @@ export class AuthService {
 
   constructor(private firebaseAuth: AngularFireAuth) { 
     this.firebaseAuth.authState.pipe(
-      map(user => user ? { ...user, providerData: user.providerData.filter(pd => pd !== null) as UserInfo[] } : null)
+      map(user => user ? { ...user, email: user.email, providerData: user.providerData.filter(pd => pd !== null) as UserInfo[] } : null)
     ).subscribe(user => {
       console.log('Auth state changed:', user);
-      this._user$.next(user);});
+      this._user$.next(user);
+    });
   }
 
   public getIdToken() {
@@ -63,5 +65,11 @@ export class AuthService {
   getCurrentUser() {
     const auth = getAuth();
     return auth.currentUser;
+  }
+
+  getUserPhotoURL(uid: string): Promise<string> {
+    const storage = getStorage();
+    const photoRef = ref(storage, `${uid}`);
+    return getDownloadURL(photoRef);
   }
 }

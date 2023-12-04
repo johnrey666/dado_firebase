@@ -1,5 +1,7 @@
 .profile-head {
-    transform: translateY(5rem)
+    transform: translateY(5rem);
+    width: 200px;
+    height: 200px;
 }
 
 .cover {

@@ -20,16 +20,15 @@ export class SignInComponent {
     event.preventDefault();
     this.authService.login(this.email, this.password).then((user) => {
       if (user) {
-        console.log('User logged in:', user);
         this.router.navigate(['/post-list'])
           .then(success => console.log('Navigation success:', success))
           .catch(error => console.log('Navigation error:', error));
       } else {
-        console.log('No user logged in');
+        console.log('invalid user');
       }
     }).catch(error => {
       console.error('Error during sign in:', error);
-      alert('Incorrect username or password'); // display an alert
+      alert('Incorrect username or password');
     });
   }
 }
