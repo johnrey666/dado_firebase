@@ -8,7 +8,8 @@ export class Post {
         public dateCreated: Date,
         public numberOfLikes: number,
         public comments: string[] = [],
-        public postedBy: string, 
-         ) {
-    }
+        public postedBy: string,
+        public deleted?: boolean, 
+        public permanentlyDeleted?: boolean
+    ) {}
 }

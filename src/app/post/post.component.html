@@ -1,8 +1,8 @@
 <br><br><br>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 
-<section class="post custom-post-section">
-  <p>Posted by: {{ post?.postedBy }}</p>
+<section *ngIf="!post?.deleted" class="post custom-post-section">
+  
     <h2 [innerHTML]="(post?.title ?? '') | highlight:searchTerm"></h2>
   <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
   <h3 [innerHTML]="(post?.description ?? '') | highlight:searchTerm"></h3>
@@ -33,7 +33,7 @@
   </div>
 <br><br>
   <div class ="auto">
-  <p>Author: {{ post?.author }}</p>
+  <p>Author: {{ post?.postedBy }}</p>
   <p>Date: {{ post?.dateCreated | date }}</p>
   </div>
 </section>

@@ -18,18 +18,18 @@ export class HeaderComponent implements OnInit {
   notifications: string[] = [];
   @ViewChild('recycleBinModal') recycleBinModal!: ElementRef;
   user$ = this.authService.user$;
+  deletedPosts: Post[] = []; // Add this line
 
+  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router) {} 
 
-constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router) {} 
-
-  deletedPosts: Post[] = [];
   ngOnInit(): void {
-    
     this.backendservice.fetchData();
     this.postService.notificationCreated.subscribe((notification: {title: string, date: string, time: string}) => { // Subscribe to the notificationCreated event
       this.onNewPostCreated(notification);
     });
-  }
+    this.postService.listChangedEvent.subscribe((posts: Post[]) => {
+      this.deletedPosts = posts.filter(post => post.deleted);
+    });  }
 
   onFetch() {
     this.backendservice.fetchData();
@@ -52,7 +52,6 @@ constructor(private backendservice: BackEndService, private postService: PostSer
   }
 
   onNewPostCreated(notification: {title: string, date: string, time: string}) {
-    
     this.notifications.push(`${notification.title} on ${notification.date} at ${notification.time}`);
   }
 
@@ -66,9 +65,17 @@ constructor(private backendservice: BackEndService, private postService: PostSer
   
   logout() {
     this.authService.signOut().then(() => {
-      
       this.router.navigate(['/login']);
     });
   }
 
+  restorePost(index: number) {
+    this.postService.restorePost(index);
+  }
+  
+permanentlyDeletePost(index: number) {
+  const post = this.deletedPosts[index];
+  const postIndex = this.postService.getPost().indexOf(post);
+  this.postService.permanentlyDeletePost(postIndex);
+}
 }

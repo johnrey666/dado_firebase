@@ -13,6 +13,10 @@ export class PostService {
   listOfPosts: Post[] = [];
   notifications: {title: string, date: string, time: string}[] = [];
 
+  getDeletedPosts() {
+    return this.listOfPosts.filter(post => post.deleted);
+  }
+
   addNotification(post: Post) {
     const date = post.dateCreated.toLocaleDateString(); // Format the date
     const time = post.dateCreated.toLocaleTimeString(); // Format the time
@@ -39,12 +43,13 @@ export class PostService {
 
   deleteButton(index: number) {
     const deletedPost = this.listOfPosts[index];
-    this.http.delete(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`).subscribe(() => {
-      console.log('Post deleted from Firebase');
-      this.listOfPosts.splice(index, 1);
-      const notification = this.addDeleteNotification(deletedPost); // Get the new notification
-      this.notificationCreated.emit(notification); // Emit the new notification
-    });
+    deletedPost.deleted = true;
+    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, deletedPost)
+      .subscribe(() => {
+        console.log('Post marked as deleted in Firebase');
+        const notification = this.addDeleteNotification(deletedPost); // Get the new notification
+        this.notificationCreated.emit(notification); // Emit the new notification
+      });
   }
   addPost(post: Post) {
     this.listOfPosts.push(post);
@@ -104,6 +109,26 @@ export class PostService {
       });
   }
 
+
+  restorePost(index: number) {
+    this.listOfPosts[index].deleted = false;
+    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, this.listOfPosts[index])
+      .subscribe(() => {
+        console.log('Post restored in Firebase');
+      });
+  }
+permanentlyDeletePost(index: number) {
+  this.http.delete(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`)
+    .subscribe(() => {
+      console.log('Post permanently deleted from Firebase');
+      // Remove the post from the listOfPosts array
+      this.listOfPosts.splice(index, 1);
+      // Emit the new list of posts
+      this.listChangedEvent.emit(this.listOfPosts);
+    });
+}
+
+  
   
   
 }

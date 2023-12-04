@@ -35,6 +35,7 @@ export class PostComponent implements OnInit {
       console.log('Deletion canceled.');
     }
   }
+  
   searchTerm: string = '';
   onEdit() {
     this.router.navigate(['/post-edit', this.index])

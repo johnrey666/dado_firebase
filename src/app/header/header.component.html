@@ -52,7 +52,7 @@
       </button>
       
 <!-- Recycle Bin Modal -->
-<div class="modal" tabindex="-1" role="dialog">
+<div #recycleBinModal class="modal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -60,10 +60,10 @@
         <button type="button" class="close" (click)="closeRecycleBinModal()">&times;</button>
       </div>
       <div class="modal-body">
-        <div>
-          <h5>post title</h5>
-          <button>Restore</button>
-          <button>Delete Permanently</button>
+        <div *ngFor="let post of deletedPosts; let i = index">
+          <h5>{{ post.title }}</h5>
+          <button (click)="restorePost(i)">Restore</button>
+          <button (click)="permanentlyDeletePost(i)">Delete Permanently</button>
         </div>
       </div>
     </div>
