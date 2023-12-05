@@ -14,14 +14,21 @@ export class PostComponent implements OnInit {
 
   memberName = "Lan";
   constructor(private postService: PostService, private router: Router, private authService: AuthService) {
+    this.userPhotoURL = '';
   }
   @Input() index: number = 0;
   @Input() post?: Post;
+  @Input() userPhotoURL: string = '';
   comments: string[] = [];
 
   ngOnInit(): void {
-    this.user = this.authService.getCurrentUser(); // replace authService with your actual authentication service
-    console.log(this.post);
+    this.authService.user$.subscribe(user => {
+      this.user = user;
+      if (user) {
+        this.userPhotoURL = user.photoURL ? user.photoURL : '';
+        console.log(this.userPhotoURL); // Add this line
+      }
+    });
     this.comments = this.postService.getComments(this.index);
   }
   delete() {

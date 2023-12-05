@@ -44,7 +44,7 @@ export class ProfileComponent implements OnInit {
 
   onUpload() {
     if (this.selectedFile) {
-      const filePath = `/files/${this.selectedFile.name}`;
+      const filePath = `/files/${this.user.uid}`;
       const storageRef = ref(this.storage, filePath);
       const uploadTask = uploadBytesResumable(storageRef, this.selectedFile);
   

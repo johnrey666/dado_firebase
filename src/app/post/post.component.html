@@ -30,8 +30,9 @@
     <button class="delete" (click)="delete()">Delete</button>
   </div>
 <br><br>
-  <div class ="auto">
+<div class ="auto">
+  <img [src]="userPhotoURL" style="height: 30px; width: 30px; border-radius: 50%;">
   <p>Author: {{ post?.postedBy }}</p>
   <p>Date: {{ post?.dateCreated | date }}</p>
-  </div>
+</div>
 </section>

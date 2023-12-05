@@ -1,8 +1,8 @@
 <ng-container *ngFor="let post of listOfPosts; let i=index">
-    <app-post [post]="post" [index]="i"></app-post>
+    <app-post [post]="post" [index]="i" [userPhotoURL]="user?.photoURL"></app-post>
 </ng-container>
 
 <!-- Display search results -->
 <div *ngFor="let searchResult of searchResults">
-  <app-post [post]="searchResult"></app-post>
+  <app-post [post]="searchResult" [userPhotoURL]="user?.photoURL"></app-post>
 </div>
