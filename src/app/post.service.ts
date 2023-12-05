@@ -2,6 +2,7 @@ import { EventEmitter, Injectable } from "@angular/core";
 import { Post } from "./post.model";
 import { HttpClient } from "@angular/common/http";
 import { map } from 'rxjs/operators'
+import { Subject } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class PostService {
@@ -10,8 +11,10 @@ export class PostService {
   postCreated = new EventEmitter<Post>();
   postDeleted = new EventEmitter<string>();
   notificationCreated = new EventEmitter<{title: string, date: string, time: string}>(); // New event emitter for notifications
+  searchResults = new Subject<Post[]>();
   listOfPosts: Post[] = [];
   notifications: {title: string, date: string, time: string}[] = [];
+
 
   getDeletedPosts() {
     return this.listOfPosts.filter(post => post.deleted);
@@ -68,9 +71,21 @@ export class PostService {
     return this.listOfPosts[index];
   }
 
-  likePost(index: number) {
-    this.listOfPosts[index].numberOfLikes++;
-    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, this.listOfPosts[index])
+  likePost(userId: string, index: number) {
+    const post = this.listOfPosts[index];
+    if (!post.likedBy) {
+      post.likedBy = [];
+    }
+    const userIndex = post.likedBy.indexOf(userId);
+    if (userIndex === -1) {
+      // User has not liked the post yet, so add their ID to the array
+      post.likedBy.push(userId);
+    } else {
+      // User has already liked the post, so remove their ID from the array
+      post.likedBy.splice(userIndex, 1);
+    }
+    post.numberOfLikes = post.likedBy.length;
+    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, post)
       .subscribe(() => {
         console.log('Post updated in Firebase');
       });
@@ -127,8 +142,13 @@ permanentlyDeletePost(index: number) {
       this.listChangedEvent.emit(this.listOfPosts);
     });
 }
+searchPosts(keyword: string): void {
+  const results = this.listOfPosts.filter(post => post.title.includes(keyword) || post.description.includes(keyword));
+  console.log('Search results:', results);
+  this.searchResults.next(results);
+}
 
-  
+
   
   
 }

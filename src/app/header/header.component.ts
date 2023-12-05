@@ -6,6 +6,8 @@ import { Post } from '../post.model';
 import { ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -14,13 +16,18 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
   searchTerm: string = '';
+  searchSubject: Subject<string> = new Subject();
   dropdownOpen: boolean = false;
   notifications: string[] = [];
   @ViewChild('recycleBinModal') recycleBinModal!: ElementRef;
   user$ = this.authService.user$;
-  deletedPosts: Post[] = []; // Add this line
+  deletedPosts: Post[] = []; 
+  listOfPost: any;
+  searchKeyword: string;
 
-  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router) {} 
+  
+
+  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router) {this.searchKeyword = '';} 
 
   ngOnInit(): void {
     this.backendservice.fetchData();
@@ -29,7 +36,15 @@ export class HeaderComponent implements OnInit {
     });
     this.postService.listChangedEvent.subscribe((posts: Post[]) => {
       this.deletedPosts = posts.filter(post => post.deleted);
-    });  }
+    });  
+  
+    // Subscribe to the searchSubject here
+  
+  }
+  
+  searchPosts() {
+    this.postService.searchPosts(this.searchKeyword);
+  }
 
   onFetch() {
     this.backendservice.fetchData();
@@ -43,10 +58,8 @@ export class HeaderComponent implements OnInit {
     return this.darkModeService.isDarkModeEnabled();
   }
 
-  onSearch(value: string) {
-    console.log('Search:', value);
-    // Implement your search logic here
-  }
+
+
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
   }
@@ -73,9 +86,11 @@ export class HeaderComponent implements OnInit {
     this.postService.restorePost(index);
   }
   
-permanentlyDeletePost(index: number) {
-  const post = this.deletedPosts[index];
-  const postIndex = this.postService.getPost().indexOf(post);
-  this.postService.permanentlyDeletePost(postIndex);
-}
+  permanentlyDeletePost(index: number) {
+    const post = this.deletedPosts[index];
+    const postIndex = this.postService.getPost().indexOf(post);
+    this.postService.permanentlyDeletePost(postIndex);
+  }
+
+
 }

@@ -7,9 +7,7 @@
   <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
   <h3 [innerHTML]="(post?.description ?? '') | highlight:searchTerm"></h3>
   <p>
-    <button type="button" (click)="onLike()" style="background: none; text-decoration: none; font-size: 24px; color: red; border: none;" class="far fa-heart"></button>&nbsp;{{ post?.numberOfLikes }}
-    
-  </p>
+    <button type="button" (click)="onLike(index)" style="background: none; text-decoration: none; font-size: 24px; color: red; border: none;" class="far fa-heart"></button>&nbsp;{{ post?.numberOfLikes }}  </p>
   <!-- Comment Section -->
   <form (ngSubmit)="onAddComment(commentInput.value)">
     <label class="font-weight-bold">Comments</label>

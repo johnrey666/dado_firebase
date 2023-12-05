@@ -81,9 +81,9 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/post-edit', index]);
   }
 
-  onLike(index: number) {
-    this.postService.likePost(index);
-  }
+ onLike(index: number) {
+  this.postService.likePost(this.user.id, index);
+}
 
   onAddComment(index: number, comment: string) {
     this.postService.addComment(index, comment);

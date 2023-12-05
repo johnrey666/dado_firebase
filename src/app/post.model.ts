@@ -10,6 +10,7 @@ export class Post {
         public comments: string[] = [],
         public postedBy: string,
         public deleted?: boolean, 
-        public permanentlyDeleted?: boolean
+        public permanentlyDeleted?: boolean,
+        public likedBy?: string[], 
     ) {}
 }

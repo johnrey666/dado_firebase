@@ -27,8 +27,10 @@
 
       <!-- Search Form -->
       <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <input [(ngModel)]="searchKeyword" placeholder="Search posts">
+        <button (click)="searchPosts()">Search</button>
       </form>
+]
 
 
       <div class="dropdown" style="display: inline-block;">

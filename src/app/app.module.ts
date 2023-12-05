@@ -18,6 +18,8 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AuthGuard } from './auth.guard';
 import { NoAuthGuard } from './noauth.guard';
 import { ProfileComponent } from './profile/profile.component'; // import NoAuthGuard
+import { Ng2SearchPipe } from 'ng2-search-filter';
+
 
 
 const routes: Routes = [
@@ -29,7 +31,8 @@ const routes: Routes = [
   { path: 'post-edit/:index', component: PostEditComponent, canActivate: [AuthGuard] },
   { path: 'login', component: SignInComponent, canActivate: [NoAuthGuard] }, // use NoAuthGuard
   { path: 'signup', component: SignUpComponent, canActivate: [NoAuthGuard] }, // use NoAuthGuard
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] }
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: 'post/:id', component: PostComponent }
 ]
 
 @NgModule({

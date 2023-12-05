@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable } from 'rxjs';
-import { User, UserInfo  } from 'firebase/auth';
+import { UserInfo  } from 'firebase/auth';
 import { map } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
-import { getAuth } from "firebase/auth";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import { User } from 'firebase/auth'; // Corrected import
+import { getAuth, updateProfile } from "firebase/auth";
 
 @Injectable({
   providedIn: 'root'
@@ -49,10 +50,22 @@ export class AuthService {
   }
   
   
-  public updateUserData(user: User | null) {
-    this._user$.next(user);
+  public async updateUserData(user: User | null) {
+    if (user) {
+      const auth = getAuth();
+      const userAuth = auth.currentUser;
+      if (userAuth) {
+        await updateProfile(userAuth, {
+          photoURL: user.photoURL
+        }).then(() => {
+          console.log('Profile updated successfully');
+          this._user$.next(user);
+        }).catch((error) => {
+          console.error('Error updating profile:', error);
+        });
+      }
+    }
   }
-
   signUp(email: string, password: string) {
     return this.firebaseAuth.createUserWithEmailAndPassword(email, password);
   }

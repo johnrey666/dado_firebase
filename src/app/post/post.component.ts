@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Post } from '../post.model';
 import { PostService } from '../post.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-post',
@@ -12,13 +13,14 @@ export class PostComponent implements OnInit {
   user: any;
 
   memberName = "Lan";
-  constructor(private postService: PostService, private router: Router) {
+  constructor(private postService: PostService, private router: Router, private authService: AuthService) {
   }
   @Input() index: number = 0;
   @Input() post?: Post;
   comments: string[] = [];
 
   ngOnInit(): void {
+    this.user = this.authService.getCurrentUser(); // replace authService with your actual authentication service
     console.log(this.post);
     this.comments = this.postService.getComments(this.index);
   }
@@ -40,8 +42,8 @@ export class PostComponent implements OnInit {
   onEdit() {
     this.router.navigate(['/post-edit', this.index])
   }
-  onLike() {
-    this.postService.likePost(this.index)
+  onLike(index: number) {
+    this.postService.likePost(this.user.id, index);
   }
   onAddComment(comment: string) {
     this.postService.addComment(this.index, comment);
