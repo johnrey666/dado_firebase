@@ -34,19 +34,30 @@
         </div>
       </form>
 
-      <div class="dropdown" style="display: inline-block;">
-        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" (click)="toggleDropdown()" aria-haspopup="true" aria-expanded="false">
-          <img src="../../assets/notification.png" alt="notification" style="width: 24px; height: 24px;">
-          <span class="badge badge-dark" *ngIf="notifications.length > 0">{{ notifications.length }}</span>
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" [class.show]="dropdownOpen">
-          <a class="dropdown-item" *ngFor="let notification of notifications">{{ notification }}</a>
-        </div>
-      </div>
+ <!-- ... -->
+<div class="dropdown" style="display: inline-block;">
+  <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" (click)="toggleNotificationsDropdown()" aria-haspopup="true" aria-expanded="false">
+    <img src="../../assets/notification.png" alt="notification" style="width: 24px; height: 24px;">
+    <span class="badge badge-dark" *ngIf="notifications.length > 0">{{ notifications.length }}</span>
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" [class.show]="notificationsDropdownOpen">
+    <a class="dropdown-item" *ngFor="let notification of notifications">{{ notification }}</a>
+  </div>
+</div>
 
-      <button  routerLink="/profile" class="btn btn-link" style=" background: none; border: none;">
-        <img src="../../assets/user.png" alt="profile" style="width: 24px; height: 24px;">
-      </button>
+<button  routerLink="/profile" class="btn btn-link" style=" background: none; border: none;">
+  <img src="../../assets/user.png" alt="profile" style="width: 24px; height: 24px;">
+</button>
+
+<div class="dropdown" style="display: inline-block;">
+  <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" (click)="toggleFriendsDropdown()" aria-haspopup="true" aria-expanded="false">
+    <img src="../../assets/friends.png" alt="friends" style="width: 24px; height: 24px;">
+  </button>
+  <div class="dropdown-menu" [class.show]="friendsDropdownOpen">
+    <a class="dropdown-item" *ngFor="let user of users" (click)="startChatWith(user)">{{ user.email }}</a>
+    </div>
+</div>
+<!-- ... -->
 
 
       <!-- Dark Mode Toggle Button -->

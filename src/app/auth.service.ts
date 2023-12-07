@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable } from 'rxjs';
 import { UserInfo  } from 'firebase/auth';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { User } from 'firebase/auth'; // Corrected import
@@ -10,6 +10,8 @@ import { getAuth, updateProfile } from "firebase/auth";
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
+
 
 
 
@@ -119,5 +121,18 @@ export class AuthService {
           );
         })
       );
+  }
+
+  getUserById(id: string): Observable<User> {
+    return this.firestore.doc<User>(`users/${id}`).snapshotChanges().pipe(
+      filter(snapshot => !!snapshot.payload.data()),
+      map(snapshot => ({ uid: snapshot.payload.id, ...snapshot.payload.data() } as User))
+    );
+  }
+
+  getUsers(): Observable<User[]> {
+    return this.firestore.collection<User>('users').valueChanges().pipe(
+      tap(users => console.log('Users from Firestore:', users))
+    );
   }
 }

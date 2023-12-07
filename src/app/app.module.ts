@@ -19,6 +19,7 @@ import { AuthGuard } from './auth.guard';
 import { NoAuthGuard } from './noauth.guard';
 import { ProfileComponent } from './profile/profile.component'; // import NoAuthGuard
 import { Ng2SearchPipe } from 'ng2-search-filter';
+import { ChatComponent } from './chat/chat.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'post-list', pathMatch: 'full' },
@@ -31,7 +32,10 @@ const routes: Routes = [
   { path: 'signup', component: SignUpComponent, canActivate: [NoAuthGuard] }, // use NoAuthGuard
   { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'post/:id', component: PostComponent },
-  { path: 'profile/:email', component: ProfileComponent }
+  { path: 'profile/:email', component: ProfileComponent },
+  { path: 'chat/:userId', component: ChatComponent },
+  { path: 'chat/:currentUserUid/:userId', component: ChatComponent },
+  { path: 'chat', component: ChatComponent }
 ]
 
 @NgModule({
@@ -45,7 +49,8 @@ const routes: Routes = [
     HighlightPipe,
     SignUpComponent,
     SignInComponent,
-    ProfileComponent
+    ProfileComponent,
+    ChatComponent
   ],
   imports: [
     BrowserModule,

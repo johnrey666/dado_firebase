@@ -18,7 +18,8 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 })
 export class HeaderComponent implements OnInit {
   searchTerm: string = '';
-  dropdownOpen: boolean = false;
+  notificationsDropdownOpen: boolean = false;
+  friendsDropdownOpen: boolean = false;
   searchDropdownOpen: boolean = false;
   notifications: string[] = [];
   @ViewChild('recycleBinModal') recycleBinModal!: ElementRef;
@@ -30,7 +31,8 @@ export class HeaderComponent implements OnInit {
   filteredUsers: any[] = [];
   users$: Observable<any[]>;
 
-  constructor(private fns: AngularFireFunctions, private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router, private firestore: AngularFirestore) {    this.searchKeyword = '';
+  constructor(private fns: AngularFireFunctions, private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router, private firestore: AngularFirestore) {    
+    this.searchKeyword = '';
     const callable = fns.httpsCallable('getAllUsers');
     this.users$ = callable({}).pipe(
       map(users => {
@@ -41,6 +43,17 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.authService.getUsers().subscribe(users => {
+      console.log('Users:', users);
+      this.users = users;
+    });
+    this.firestore.collection('users').snapshotChanges().subscribe(users => {
+      this.users = users.map(user => {
+        const data = user.payload.doc.data() as any;
+        const id = user.payload.doc.id;
+        return { id, ...data };
+      });
+    });
     this.backendservice.fetchData();
     this.postService.notificationCreated.subscribe((notification: {title: string, date: string, time: string}) => {
       this.onNewPostCreated(notification);
@@ -60,10 +73,6 @@ export class HeaderComponent implements OnInit {
 
   isDarkModeEnabled() {
     return this.darkModeService.isDarkModeEnabled();
-  }
-
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
   }
 
   onNewPostCreated(notification: {title: string, date: string, time: string}) {
@@ -110,5 +119,23 @@ export class HeaderComponent implements OnInit {
 
   toggleSearchDropdown() {
     this.searchDropdownOpen = !this.searchDropdownOpen;
+  }
+
+  toggleNotificationsDropdown() {
+    this.notificationsDropdownOpen = !this.notificationsDropdownOpen;
+  }
+
+  toggleFriendsDropdown() {
+    this.friendsDropdownOpen = !this.friendsDropdownOpen;
+  }
+  startChatWith(user: any): void {
+    let currentUser = this.authService.getCurrentUser();
+    console.log('Current user:', currentUser);
+    console.log('User to chat with:', user);
+    if(currentUser !== null) {
+      this.router.navigate(['/chat', currentUser.uid, user.id]);
+    } else {
+      // Handle the case when currentUser is null
+    }
   }
 }
