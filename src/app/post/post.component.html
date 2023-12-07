@@ -31,8 +31,8 @@
   </div>
 <br><br>
 <div class ="auto">
-  <img [src]="userPhotoURL" style="height: 30px; width: 30px; border-radius: 50%;">
-  <p>Author: {{ post?.postedBy }}</p>
+  <img [src]="(user$ | async)?.photoURL" style="height: 30px; width: 30px; border-radius: 50%;">
+    <p>Author: {{ post?.postedBy }}</p>
   <p>Date: {{ post?.dateCreated | date }}</p>
 </div>
 </section>

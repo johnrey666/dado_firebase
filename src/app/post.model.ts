@@ -12,5 +12,6 @@ export class Post {
         public deleted?: boolean, 
         public permanentlyDeleted?: boolean,
         public likedBy?: string[], 
+        public photoURL?: string, // Add this line
     ) {}
 }

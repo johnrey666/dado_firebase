@@ -34,8 +34,6 @@ export class PostListComponent implements OnInit {
     this.postService.listChangedEvent.subscribe((posts: Post[]) => {
       this.listOfPosts = posts;
     });
-    this.postService.searchResults.subscribe(results => {
-      this.searchResults = results;
-    });
+
   }
 }

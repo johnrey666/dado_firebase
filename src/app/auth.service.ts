@@ -7,15 +7,18 @@ import { BehaviorSubject } from 'rxjs';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { User } from 'firebase/auth'; // Corrected import
 import { getAuth, updateProfile } from "firebase/auth";
+import { AngularFirestore } from '@angular/fire/compat/firestore';
+
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class AuthService {
   private _user$ = new BehaviorSubject<User | null>(null);
   user$ = this._user$.asObservable();
 
-  constructor(private firebaseAuth: AngularFireAuth) { 
+  constructor(private firebaseAuth: AngularFireAuth, private firestore: AngularFirestore) {     
     this.firebaseAuth.authState.pipe(
       map(user => user ? { ...user, email: user.email, providerData: user.providerData.filter(pd => pd !== null) as UserInfo[] } : null)
     ).subscribe(user => {
@@ -49,7 +52,6 @@ export class AuthService {
     }
   }
   
-  
   public async updateUserData(user: User | null) {
     if (user) {
       const auth = getAuth();
@@ -66,8 +68,14 @@ export class AuthService {
       }
     }
   }
+
   signUp(email: string, password: string) {
-    return this.firebaseAuth.createUserWithEmailAndPassword(email, password);
+    return this.firebaseAuth.createUserWithEmailAndPassword(email, password).then((result) => {
+      return this.firestore.collection('users').doc(result.user?.uid).set({
+        email: result.user?.email,
+        // Add any other user properties you need
+      });
+    });
   }
 
   async signOut() {
@@ -84,5 +92,11 @@ export class AuthService {
     const storage = getStorage();
     const photoRef = ref(storage, `${uid}`);
     return getDownloadURL(photoRef);
+  }
+
+  getUserByEmail(email: string): Observable<User> {
+    return this.firestore.collection('users', ref => ref.where('email', '==', email))
+      .valueChanges()
+      .pipe(map(users => users[0] as User));
   }
 }

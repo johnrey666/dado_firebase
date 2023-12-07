@@ -10,6 +10,7 @@
   },
   "private": true,
   "dependencies": {
+    "-": "^0.0.1",
     "@angular/animations": "^16.2.0",
     "@angular/common": "^16.2.0",
     "@angular/compiler": "^16.2.0",
@@ -20,6 +21,8 @@
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
     "firebase": "^10.7.0",
+    "firebase-tools": "^12.9.1",
+    "g": "^2.0.1",
     "ng2-search-filter": "^0.5.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

@@ -11,7 +11,6 @@ export class PostService {
   postCreated = new EventEmitter<Post>();
   postDeleted = new EventEmitter<string>();
   notificationCreated = new EventEmitter<{title: string, date: string, time: string}>(); // New event emitter for notifications
-  searchResults = new Subject<Post[]>();
   listOfPosts: Post[] = [];
   notifications: {title: string, date: string, time: string}[] = [];
 
@@ -40,14 +39,14 @@ export class PostService {
     // Here you can add code to retrieve the notifications array from the backend
   }
 
-  getPost() {
+  getPost() { 
     return this.listOfPosts;
   }
 
   deleteButton(index: number) {
     const deletedPost = this.listOfPosts[index];
     deletedPost.deleted = true;
-    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, deletedPost)
+    this.http.put(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, deletedPost)
       .subscribe(() => {
         console.log('Post marked as deleted in Firebase');
         const notification = this.addDeleteNotification(deletedPost); // Get the new notification
@@ -85,7 +84,7 @@ export class PostService {
       post.likedBy.splice(userIndex, 1);
     }
     post.numberOfLikes = post.likedBy.length;
-    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, post)
+    this.http.put(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, post)
       .subscribe(() => {
         console.log('Post updated in Firebase');
       });
@@ -93,7 +92,7 @@ export class PostService {
 
   addComment(index: number, comment: string) {
     this.listOfPosts[index].comments.push(comment);
-    this.http.patch(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, { comments: this.listOfPosts[index].comments })
+    this.http.patch(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, { comments: this.listOfPosts[index].comments })
       .subscribe(() => {
         console.log('Comment added to Firebase');
       });
@@ -110,7 +109,7 @@ export class PostService {
 
   editComment(postIndex: number, commentIndex: number, newComment: string) {
     this.listOfPosts[postIndex].comments[commentIndex] = newComment;
-    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postIndex}.json`, this.listOfPosts[postIndex])
+    this.http.put(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postIndex}.json`, this.listOfPosts[postIndex])
       .subscribe(() => {
         console.log('Comment updated in Firebase');
       });
@@ -118,7 +117,7 @@ export class PostService {
   
   deleteComment(postIndex: number, commentIndex: number) {
     this.listOfPosts[postIndex].comments.splice(commentIndex, 1);
-    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postIndex}.json`, this.listOfPosts[postIndex])
+    this.http.put(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${postIndex}.json`, this.listOfPosts[postIndex])
       .subscribe(() => {
         console.log('Comment deleted from Firebase');
       });
@@ -127,13 +126,13 @@ export class PostService {
 
   restorePost(index: number) {
     this.listOfPosts[index].deleted = false;
-    this.http.put(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, this.listOfPosts[index])
+    this.http.put(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`, this.listOfPosts[index])
       .subscribe(() => {
         console.log('Post restored in Firebase');
       });
   }
 permanentlyDeletePost(index: number) {
-  this.http.delete(`https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`)
+  this.http.delete(`https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${index}.json`)
     .subscribe(() => {
       console.log('Post permanently deleted from Firebase');
       // Remove the post from the listOfPosts array
@@ -142,12 +141,15 @@ permanentlyDeletePost(index: number) {
       this.listChangedEvent.emit(this.listOfPosts);
     });
 }
-searchPosts(keyword: string): void {
-  const results = this.listOfPosts.filter(post => post.title.includes(keyword) || post.description.includes(keyword));
-  console.log('Search results:', results);
-  this.searchResults.next(results);
-}
 
+
+createPost(postData: any, photoURL: string) {
+  // Add the photoURL to the post data
+  const post = { ...postData, photoURL };
+
+  // Save the post data
+  // ...
+}
 
   
   

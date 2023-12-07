@@ -9,13 +9,13 @@
                       <br><br>
                   </div> 
                   <div class="profile-pic-container">
-                      <label class="file-label">
-                          <img [src]="user?.photoURL || 'default-image-url'" alt="..." class="profile-pic">
-                          <span class="upload-icon">&#8593;</span>
-                          <input type="file" (change)="onFileSelected($event)">
-                          <button (click)="onUpload()">Upload</button>
-                      </label>
-                  </div>
+                    <label class="file-label">
+                        <img [src]="user?.photoURL || 'default-image-url'" alt="..." class="profile-pic">
+                        <span class="upload-icon" *ngIf="isCurrentUser">&#8593;</span>
+                        <input type="file" (change)="onFileSelected($event)" *ngIf="isCurrentUser">
+                        <button (click)="onUpload()" *ngIf="isCurrentUser">Upload</button>
+                    </label>
+                </div>
               </div> 
           </div> 
           <div class="py-4 px-4"> 

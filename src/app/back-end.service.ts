@@ -14,7 +14,7 @@ export class BackEndService {
  
 saveData(){
     const listofPosts: Post[] = this.postService.getPost();
-    this.http.put('https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json', listofPosts)
+    this.http.put('https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json', listofPosts)
     .subscribe((res) => {
       console.log(res);
       // Call setPosts after saving the new post
@@ -23,7 +23,7 @@ saveData(){
   }
 
   fetchData(): Observable<Post[]> {
-    return this.http.get<Post[]>('https://fir-aac7d-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json')
+    return this.http.get<Post[]>('https://fir-3-6b65e-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json')
       .pipe(tap((listofPosts: Post[])=> {
         console.log(listofPosts)
   

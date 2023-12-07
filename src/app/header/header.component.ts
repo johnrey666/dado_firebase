@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { BackEndService } from '../back-end.service';
 import { PostService } from '../post.service';
-import { DarkModeService } from '../dark-mode.service'; // Import the DarkModeService
+import { DarkModeService } from '../dark-mode.service';
 import { Post } from '../post.model';
 import { ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { AngularFireFunctions } from '@angular/fire/compat/functions';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 
 @Component({
   selector: 'app-header',
@@ -16,34 +18,36 @@ import { debounceTime } from 'rxjs/operators';
 })
 export class HeaderComponent implements OnInit {
   searchTerm: string = '';
-  searchSubject: Subject<string> = new Subject();
   dropdownOpen: boolean = false;
+  searchDropdownOpen: boolean = false;
   notifications: string[] = [];
   @ViewChild('recycleBinModal') recycleBinModal!: ElementRef;
   user$ = this.authService.user$;
-  deletedPosts: Post[] = []; 
+  deletedPosts: Post[] = [];
   listOfPost: any;
   searchKeyword: string;
+  users: any[] = [];
+  filteredUsers: any[] = [];
+  users$: Observable<any[]>;
 
-  
-
-  constructor(private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router) {this.searchKeyword = '';} 
+  constructor(private fns: AngularFireFunctions, private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router, private firestore: AngularFirestore) {    this.searchKeyword = '';
+    const callable = fns.httpsCallable('getAllUsers');
+    this.users$ = callable({}).pipe(
+      map(users => {
+        console.log('Users from getAllUsers:', users);
+        return users.filter((user: { email: string }) => user.email.includes(this.searchTerm));
+      })
+    );
+  }
 
   ngOnInit(): void {
     this.backendservice.fetchData();
-    this.postService.notificationCreated.subscribe((notification: {title: string, date: string, time: string}) => { // Subscribe to the notificationCreated event
+    this.postService.notificationCreated.subscribe((notification: {title: string, date: string, time: string}) => {
       this.onNewPostCreated(notification);
     });
     this.postService.listChangedEvent.subscribe((posts: Post[]) => {
       this.deletedPosts = posts.filter(post => post.deleted);
-    });  
-  
-    // Subscribe to the searchSubject here
-  
-  }
-  
-  searchPosts() {
-    this.postService.searchPosts(this.searchKeyword);
+    });
   }
 
   onFetch() {
@@ -58,8 +62,6 @@ export class HeaderComponent implements OnInit {
     return this.darkModeService.isDarkModeEnabled();
   }
 
-
-
   toggleDropdown() {
     this.dropdownOpen = !this.dropdownOpen;
   }
@@ -71,11 +73,11 @@ export class HeaderComponent implements OnInit {
   openRecycleBinModal() {
     this.recycleBinModal.nativeElement.style.display = 'block';
   }
-  
+
   closeRecycleBinModal() {
     this.recycleBinModal.nativeElement.style.display = 'none';
   }
-  
+
   logout() {
     this.authService.signOut().then(() => {
       this.router.navigate(['/login']);
@@ -85,12 +87,28 @@ export class HeaderComponent implements OnInit {
   restorePost(index: number) {
     this.postService.restorePost(index);
   }
-  
+
   permanentlyDeletePost(index: number) {
     const post = this.deletedPosts[index];
     const postIndex = this.postService.getPost().indexOf(post);
     this.postService.permanentlyDeletePost(postIndex);
   }
 
+  searchFunction(event: Event) {
+    event.preventDefault();
+    console.log('searchFunction called with keyword:', this.searchKeyword);
+    // Fetch all users from Firestore
+    this.firestore.collection('users').valueChanges().subscribe(users => {
+      // Filter the users based on the search term
+      this.filteredUsers = users.filter((user: any) => user.email.includes(this.searchKeyword));
+    });
+    this.toggleSearchDropdown();
+  }
+  navigateToProfile(email: string) {
+    this.router.navigate(['/profile', email]);
+  }
 
+  toggleSearchDropdown() {
+    this.searchDropdownOpen = !this.searchDropdownOpen;
+  }
 }
