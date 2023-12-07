@@ -6,6 +6,7 @@ import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'firebase/
 import { finalize } from 'rxjs/operators';
 import { Post } from '../post.model';
 import { Router, ActivatedRoute } from '@angular/router';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -22,13 +23,14 @@ export class ProfileComponent implements OnInit {
   isCurrentUser: boolean = false;
   
 
-  constructor(private authService: AuthService, private postService: PostService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private authService: AuthService, private postService: PostService, private router: Router, private route: ActivatedRoute, private firestore: AngularFirestore) { }
 
   ngOnInit(): void {
     const email = this.route.snapshot.paramMap.get('email');
     if (email) {
       // Fetch the user's data using the email
       this.authService.getUserByEmail(email).subscribe(user => {
+        console.log('User Data:', user);
         this.user = user;
         this.isCurrentUser = false;
         // Fetch the posts for this user
@@ -38,6 +40,7 @@ export class ProfileComponent implements OnInit {
           this.user.photoURL = photoURL;
         });
       });
+      
     } else {
       // Display the profile of the currently logged in user
       this.user = this.authService.getCurrentUser();
@@ -47,6 +50,7 @@ export class ProfileComponent implements OnInit {
           this.userPosts = this.postService.getPost().filter(post => post.postedBy === user.email);
           // Retrieve the user's photoURL from the database
           this.authService.getUserPhotoURL(user.uid).then(photoURL => {
+            console.log('Photo URL:', photoURL);
             this.user.photoURL = photoURL;
           });
         }
@@ -81,9 +85,11 @@ export class ProfileComponent implements OnInit {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log('File available at', downloadURL);
-            this.user.photoURL = downloadURL;
+            this.user = { ...this.user, photoURL: downloadURL };
             // Save the user's data with the new photoURL
             this.authService.updateUserData(this.user);
+            // Save the photoURL in Firestore
+            this.firestore.collection('users').doc(this.user.uid).update({ photoURL: downloadURL });
           });
         }
       );
@@ -109,7 +115,6 @@ export class ProfileComponent implements OnInit {
 
   onAddComment(index: number, comment: string) {
     this.postService.addComment(index, comment);
-    // Refresh the comments
     this.userPosts[index].comments = this.postService.getComments(index);
   }
 

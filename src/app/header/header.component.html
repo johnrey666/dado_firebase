@@ -26,8 +26,9 @@
       </ul>
 
       <form class="form-inline my-2 my-lg-0 dropdown" (submit)="searchFunction($event)">
-        <input [(ngModel)]="searchKeyword" name="searchKeyword" placeholder="Search posts" data-toggle="dropdown">
-        <button (click)="searchFunction($event)">Search</button>
+        <input class="search-input" [(ngModel)]="searchKeyword" name="searchKeyword" placeholder="Search posts" data-toggle="dropdown">
+         <button class="search-button" (click)="searchFunction($event)">Search</button>
+ 
         <div class="dropdown-menu" [class.show]="searchDropdownOpen && filteredUsers.length > 0">
           <a class="dropdown-item" *ngFor="let user of filteredUsers" (click)="navigateToProfile(user.email)">{{ user.email }}</a>
         </div>

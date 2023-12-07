@@ -8,6 +8,9 @@ import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import { User } from 'firebase/auth'; // Corrected import
 import { getAuth, updateProfile } from "firebase/auth";
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+
 
 
 @Injectable({
@@ -98,5 +101,23 @@ export class AuthService {
     return this.firestore.collection('users', ref => ref.where('email', '==', email))
       .valueChanges()
       .pipe(map(users => users[0] as User));
+  }
+  getUserAndPhotoByEmail(email: string): Observable<User> {
+    return this.firestore.collection('users', ref => ref.where('email', '==', email))
+      .valueChanges()
+      .pipe(
+        map(users => {
+          console.log('Users:', users); // Add this line
+          return users[0] as User;
+        }),
+        switchMap(user => {
+          return from(this.getUserPhotoURL(user.uid)).pipe(
+            map(photoURL => {
+              console.log('Photo URL:', photoURL); // Add this line
+              return { ...user, photoURL: photoURL };
+            })
+          );
+        })
+      );
   }
 }
