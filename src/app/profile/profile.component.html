@@ -15,8 +15,11 @@
                       <input type="file" (change)="onFileSelected($event)" *ngIf="isCurrentUser">
                       <button (click)="onUpload()" *ngIf="isCurrentUser">Upload</button>
                     </label>
-                    <button class="friend-button" *ngIf="!friendRequestSent && !isCurrentUser" (click)="sendFriendRequest()"><i class="fas fa-plus"></i> Add Friend</button>
-                    <button class="cancel-button" *ngIf="friendRequestSent && !isCurrentUser" (click)="cancelFriendRequest()"><i class="fas fa-times"></i> Cancel Friend Request</button>       
+                    <button class="friend-button" *ngIf="!friendRequestSent && !isCurrentUser && !areFriends" (click)="sendFriendRequest()"><i class="fas fa-plus"></i> Add Friend</button>
+                    <button class="cancel-button" *ngIf="friendRequestSent && !isCurrentUser && !areFriends" (click)="cancelFriendRequest()"><i class="fas fa-times"></i> Cancel Friend Request</button>
+                    <div *ngIf="areFriends" class="friends-label">
+                      <i class="fas fa-check"></i> Friends
+                    </div>
                             </div>
               </div> 
           </div> 

@@ -15,7 +15,7 @@ import { ChangeDetectorRef } from '@angular/core';
 
 interface FriendRequest {
   senderEmail: string;
-  // other properties...
+  id: string;
 }
 
 @Component({
@@ -58,10 +58,14 @@ export class HeaderComponent implements OnInit {
         this.authService.getFriendRequestsForUser(currentUser.email).subscribe(friendRequests => {
           console.log('Received friend requests:', friendRequests);
           friendRequests.forEach(friendRequest => {
-            const notification = `${friendRequest.senderEmail} Sent a Friend Request`;
-            this.notifications.push(notification);
-            // Add senderPhotoURL here
-            this.allNotifications.push({message: notification, type: 'friendRequest', senderPhotoURL: friendRequest.senderPhotoURL});
+            const notification = {
+              message: `${friendRequest.senderEmail} Sent a Friend Request`,
+              type: 'friendRequest',
+              senderPhotoURL: friendRequest.senderPhotoURL,
+              requestId: friendRequest.id  // Add this line
+            };
+            this.notifications.push(notification.message);
+            this.allNotifications.push(notification);
           });
           console.log('All notifications:', this.allNotifications);
         });
@@ -176,10 +180,12 @@ export class HeaderComponent implements OnInit {
   }
 
   acceptFriendRequest(notification: any) {
+    console.log('Notification:', notification);
     this.authService.acceptFriendRequest(notification.requestId);
   }
 
   declineFriendRequest(notification: any) {
+    console.log('Notification:', notification);
     this.authService.declineFriendRequest(notification.requestId);
   }
   

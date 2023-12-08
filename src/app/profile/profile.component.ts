@@ -1,4 +1,3 @@
-
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { PostService } from '../post.service';
@@ -7,6 +6,7 @@ import { finalize } from 'rxjs/operators';
 import { Post } from '../post.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -22,7 +22,7 @@ export class ProfileComponent implements OnInit {
   comments: string[] = []; // Add this line
   isCurrentUser: boolean = false;
   friendRequestSent: boolean = false;
-  
+  areFriends: boolean = false;
 
   constructor(private authService: AuthService, private postService: PostService, private router: Router, private route: ActivatedRoute, private firestore: AngularFirestore) { }
 
@@ -41,8 +41,14 @@ export class ProfileComponent implements OnInit {
         this.authService.getUserPhotoURL(user.uid).then(photoURL => {
           this.user.photoURL = photoURL;
         });
+        // Check if the current user and this user are friends
+        const currentUser = this.authService.getCurrentUser();
+        if (currentUser) {
+          this.authService.areFriends(currentUser.uid, user.uid).subscribe(areFriends => {
+            this.areFriends = areFriends;
+          });
+        }
       });
-      
     } else {
       // Display the profile of the currently logged in user
       this.user = this.authService.getCurrentUser();

@@ -15,12 +15,10 @@ import { filter } from 'rxjs/operators';
 interface FriendRequest {
   senderEmail: string;
   senderPhotoURL: string;
-  // other properties...
-}
-
-interface FriendRequest {
+  id: string;
   senderId: string;
   receiverId: string;
+  receiverEmail: string;
 }
 
 @Injectable({
@@ -109,8 +107,14 @@ export class AuthService {
 
   getUserByEmail(email: string): Observable<User> {
     return this.firestore.collection('users', ref => ref.where('email', '==', email))
-      .valueChanges()
-      .pipe(map(users => users[0] as User));
+      .snapshotChanges()
+      .pipe(
+        map(users => {
+          const user = users[0].payload.doc.data() as User;
+          const id = users[0].payload.doc.id;
+          return { ...user, uid: id };
+        })
+      );
   }
   getUserAndPhotoByEmail(email: string): Observable<User> {
     return this.firestore.collection('users', ref => ref.where('email', '==', email))
@@ -196,27 +200,62 @@ export class AuthService {
   }
 
   acceptFriendRequest(requestId: string) {
-    const requestRef = this.firestore.collection('friendRequests').doc(requestId);
-    requestRef.get().toPromise().then(doc => {
+    console.log('Accepting friend request with ID:', requestId);
+    // Get the friend request document
+    this.firestore.collection('friendRequests').doc(requestId).get().toPromise().then(doc => {
       if (doc && doc.exists) {
-        const { senderId, receiverId } = doc.data() as FriendRequest;
-        this.firestore.collection('friends').add({ userId1: senderId, userId2: receiverId });
-        requestRef.delete();
+        const { senderEmail, receiverEmail } = doc.data() as FriendRequest;
+        console.log('Friend request data:', { senderEmail, receiverEmail });
+  
+        // Fetch the sender and receiver user documents
+
+        Promise.all([
+          this.getUserByEmail(senderEmail).pipe(take(1)).toPromise(),
+          this.getUserByEmail(receiverEmail).pipe(take(1)).toPromise()
+        ]).then(([sender, receiver]) => {
+          console.log('Sender:', sender);
+          console.log('Receiver:', receiver);
+          if (sender && receiver && sender.uid && receiver.uid) {
+            // Add a document to the 'friends' collection
+            this.firestore.collection('friends').add({ userId1: sender.uid, userId2: receiver.uid });
+          } else {
+            console.error('Could not fetch sender or receiver user document');
+          }
+        });
+  
+        // Delete the friend request
+        doc.ref.delete();
       }
     });
   }
   
   declineFriendRequest(requestId: string) {
+    console.log('Declining friend request with ID:', requestId);
+    // Delete the friend request document
     this.firestore.collection('friendRequests').doc(requestId).delete();
   }
   
   getFriendRequestsForUser(email: string): Observable<FriendRequest[]> {
     return this.firestore.collection<FriendRequest>('friendRequests', ref => ref.where('receiverEmail', '==', email))
-      .valueChanges()
+      .snapshotChanges()
       .pipe(
+        map(actions => actions.map(a => {
+          const data = a.payload.doc.data() as FriendRequest;
+          const id = a.payload.doc.id;
+          return { ...data, id };
+        })),
         tap(requests => console.log('Friend requests:', requests)) // Add this line
       );
   }
+  areFriends(userId1: string, userId2: string): Observable<boolean> {
+    return this.firestore.collection('friends', ref => ref
+      .where('userId1', 'in', [userId1, userId2])
+      .where('userId2', 'in', [userId1, userId2]))
+      .valueChanges()
+      .pipe(map(friends => friends.length > 0));
+  }
+
+  
 
   
 
