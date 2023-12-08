@@ -35,13 +35,25 @@
       </form>
 
  <!-- ... -->
+<!-- Notifications Dropdown -->
 <div class="dropdown" style="display: inline-block;">
   <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuButton" (click)="toggleNotificationsDropdown()" aria-haspopup="true" aria-expanded="false">
     <img src="../../assets/notification.png" alt="notification" style="width: 24px; height: 24px;">
     <span class="badge badge-dark" *ngIf="notifications.length > 0">{{ notifications.length }}</span>
   </button>
   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" [class.show]="notificationsDropdownOpen">
-    <a class="dropdown-item" *ngFor="let notification of notifications">{{ notification }}</a>
+    <div *ngFor="let notification of allNotifications">
+      <div class="dropdown-item d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <img [src]="notification.senderPhotoURL || 'https://www.lightsong.net/wp-content/uploads/2020/12/blank-profile-circle.png'" alt="Sender profile picture" style="width: 24px; height: 24px;">
+          <strong>{{ notification.message }}</strong>
+        </div>
+        <div *ngIf="notification.type === 'friendRequest'" class="notification-buttons">
+          <button class="accept-button" (click)="acceptFriendRequest(notification)">Accept</button>
+          <button class="decline-button" (click)="declineFriendRequest(notification)">Decline</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -54,8 +66,12 @@
     <img src="../../assets/friends.png" alt="friends" style="width: 24px; height: 24px;">
   </button>
   <div class="dropdown-menu" [class.show]="friendsDropdownOpen">
-    <a class="dropdown-item" *ngFor="let user of users" (click)="startChatWith(user)">{{ user.email }}</a>
-    </div>
+    <a class="dropdown-item friend-item" *ngFor="let user of users" (click)="startChatWith(user)">
+      <img class="friend-avatar" [src]="user.photoURL || 'https://www.lightsong.net/wp-content/uploads/2020/12/blank-profile-circle.png'" style="border-radius: 50%;" alt="User profile picture">
+      {{ user.email }}
+      <span *ngIf="user.unreadMessagesCount > 0" class="badge badge-danger">{{ user.unreadMessagesCount }}</span>
+    </a>
+  </div>
 </div>
 <!-- ... -->
 

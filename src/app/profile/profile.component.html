@@ -10,11 +10,14 @@
                   </div> 
                   <div class="profile-pic-container">
                     <label class="file-label">
-                      <img [src]="user?.photoURL || 'http://www.baytekent.com/wp-content/uploads/2016/12/facebook-default-no-profile-pic1.jpg'" alt="..." class="profile-pic">                        <span class="upload-icon" *ngIf="isCurrentUser">&#8593;</span>
-                        <input type="file" (change)="onFileSelected($event)" *ngIf="isCurrentUser">
-                        <button (click)="onUpload()" *ngIf="isCurrentUser">Upload</button>
+                      <img [src]="user?.photoURL || 'http://www.baytekent.com/wp-content/uploads/2016/12/facebook-default-no-profile-pic1.jpg'" alt="..." class="profile-pic">
+                      <span class="upload-icon" *ngIf="isCurrentUser">&#8593;</span>
+                      <input type="file" (change)="onFileSelected($event)" *ngIf="isCurrentUser">
+                      <button (click)="onUpload()" *ngIf="isCurrentUser">Upload</button>
                     </label>
-                </div>
+                    <button class="friend-button" *ngIf="!friendRequestSent && !isCurrentUser" (click)="sendFriendRequest()"><i class="fas fa-plus"></i> Add Friend</button>
+                    <button class="cancel-button" *ngIf="friendRequestSent && !isCurrentUser" (click)="cancelFriendRequest()"><i class="fas fa-times"></i> Cancel Friend Request</button>       
+                            </div>
               </div> 
           </div> 
           <div class="py-4 px-4"> 

@@ -2,18 +2,26 @@ import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { Observable } from 'rxjs';
 import { UserInfo  } from 'firebase/auth';
-import { map, tap } from 'rxjs/operators';
+import { map, take, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import { User } from 'firebase/auth'; // Corrected import
+import { User } from 'firebase/auth';
 import { getAuth, updateProfile } from "firebase/auth";
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { filter } from 'rxjs/operators';
 
+interface FriendRequest {
+  senderEmail: string;
+  senderPhotoURL: string;
+  // other properties...
+}
 
-
+interface FriendRequest {
+  senderId: string;
+  receiverId: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -109,13 +117,13 @@ export class AuthService {
       .valueChanges()
       .pipe(
         map(users => {
-          console.log('Users:', users); // Add this line
+          console.log('Users:', users);
           return users[0] as User;
         }),
         switchMap(user => {
           return from(this.getUserPhotoURL(user.uid)).pipe(
             map(photoURL => {
-              console.log('Photo URL:', photoURL); // Add this line
+              console.log('Photo URL:', photoURL);
               return { ...user, photoURL: photoURL };
             })
           );
@@ -135,4 +143,82 @@ export class AuthService {
       tap(users => console.log('Users from Firestore:', users))
     );
   }
+
+  sendFriendRequest(receiverEmail: string) {
+    if (receiverEmail) {
+      const currentUser = this.getCurrentUser();
+      const senderEmail = currentUser ? currentUser.email : null;
+      // Check if a friend request already exists
+      this.firestore.collection('friendRequests', ref => ref.where('senderEmail', '==', senderEmail).where('receiverEmail', '==', receiverEmail))
+        .valueChanges()
+        .pipe(take(1)) // Only take the first emission
+        .subscribe(requests => {
+          if (requests.length === 0) {
+            // If no friend request exists, add a new one
+            this.firestore.collection('friendRequests').add({ senderEmail, receiverEmail });
+          } else {
+            console.error('A friend request from this user already exists');
+          }
+        });
+    } else {
+      console.error('Receiver Email is undefined');
+    }
+  }
+
+  cancelFriendRequest(receiverEmail: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (receiverEmail) {
+        const currentUser = this.getCurrentUser();
+        const senderEmail = currentUser ? currentUser.email : null;
+        // Get the friend request document
+        this.firestore.collection('friendRequests', ref => ref.where('senderEmail', '==', senderEmail).where('receiverEmail', '==', receiverEmail))
+          .snapshotChanges()
+          .pipe(take(1)) // Only take the first emission
+          .subscribe(requests => {
+            if (requests.length > 0) {
+              // If a friend request exists, delete it
+              const requestId = requests[0].payload.doc.id;
+              this.firestore.collection('friendRequests').doc(requestId).delete().then(() => {
+                resolve();
+              }).catch((error) => {
+                reject(error);
+              });
+            } else {
+              console.error('No friend request from this user exists');
+              reject('No friend request from this user exists');
+            }
+          });
+      } else {
+        console.error('Receiver Email is undefined');
+        reject('Receiver Email is undefined');
+      }
+    });
+  }
+
+  acceptFriendRequest(requestId: string) {
+    const requestRef = this.firestore.collection('friendRequests').doc(requestId);
+    requestRef.get().toPromise().then(doc => {
+      if (doc && doc.exists) {
+        const { senderId, receiverId } = doc.data() as FriendRequest;
+        this.firestore.collection('friends').add({ userId1: senderId, userId2: receiverId });
+        requestRef.delete();
+      }
+    });
+  }
+  
+  declineFriendRequest(requestId: string) {
+    this.firestore.collection('friendRequests').doc(requestId).delete();
+  }
+  
+  getFriendRequestsForUser(email: string): Observable<FriendRequest[]> {
+    return this.firestore.collection<FriendRequest>('friendRequests', ref => ref.where('receiverEmail', '==', email))
+      .valueChanges()
+      .pipe(
+        tap(requests => console.log('Friend requests:', requests)) // Add this line
+      );
+  }
+
+  
+
+  
 }

@@ -60,7 +60,7 @@ const routes: Routes = [
     ReactiveFormsModule,
     HttpClientModule
   ],
-  providers: [AuthGuard, NoAuthGuard], // add NoAuthGuard to providers
+  providers: [AuthGuard, NoAuthGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -10,6 +10,13 @@ import { AngularFireFunctions } from '@angular/fire/compat/functions';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { ChatService } from '../chat.service'; // Import ChatService
+import { ChangeDetectorRef } from '@angular/core';
+
+interface FriendRequest {
+  senderEmail: string;
+  // other properties...
+}
 
 @Component({
   selector: 'app-header',
@@ -30,8 +37,9 @@ export class HeaderComponent implements OnInit {
   users: any[] = [];
   filteredUsers: any[] = [];
   users$: Observable<any[]>;
+  allNotifications: { message: string; type: string; senderPhotoURL?: string;}[] = [];
 
-  constructor(private fns: AngularFireFunctions, private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router, private firestore: AngularFirestore) {    
+  constructor(private fns: AngularFireFunctions, private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router, private firestore: AngularFirestore, private chatService: ChatService, private cdr: ChangeDetectorRef) { // Inject ChatService
     this.searchKeyword = '';
     const callable = fns.httpsCallable('getAllUsers');
     this.users$ = callable({}).pipe(
@@ -43,9 +51,35 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const currentUser = this.authService.getCurrentUser();
+    this.authService.user$.subscribe(currentUser => {
+      if (currentUser && currentUser.email) {
+        console.log('Current user email:', currentUser.email);
+        this.authService.getFriendRequestsForUser(currentUser.email).subscribe(friendRequests => {
+          console.log('Received friend requests:', friendRequests);
+          friendRequests.forEach(friendRequest => {
+            const notification = `${friendRequest.senderEmail} Sent a Friend Request`;
+            this.notifications.push(notification);
+            // Add senderPhotoURL here
+            this.allNotifications.push({message: notification, type: 'friendRequest', senderPhotoURL: friendRequest.senderPhotoURL});
+          });
+          console.log('All notifications:', this.allNotifications);
+        });
+      }
+    });
+
     this.authService.getUsers().subscribe(users => {
       console.log('Users:', users);
       this.users = users;
+    
+      this.users.forEach(user => {
+        if (currentUser) {
+            this.chatService.getUnreadMessagesCount(currentUser.uid, user.uid).subscribe(count => {
+                user.unreadMessagesCount = count;
+                this.cdr.detectChanges(); // manually trigger change detection
+            });
+        }
+    });
     });
     this.firestore.collection('users').snapshotChanges().subscribe(users => {
       this.users = users.map(user => {
@@ -76,7 +110,9 @@ export class HeaderComponent implements OnInit {
   }
 
   onNewPostCreated(notification: {title: string, date: string, time: string}) {
-    this.notifications.push(`${notification.title} on ${notification.date} at ${notification.time}`);
+    const newNotification = `${notification.title} on ${notification.date} at ${notification.time}`;
+    this.notifications.push(newNotification);
+    this.allNotifications.push({message: newNotification, type: 'postCreated'});
   }
 
   openRecycleBinModal() {
@@ -138,4 +174,13 @@ export class HeaderComponent implements OnInit {
       // Handle the case when currentUser is null
     }
   }
+
+  acceptFriendRequest(notification: any) {
+    this.authService.acceptFriendRequest(notification.requestId);
+  }
+
+  declineFriendRequest(notification: any) {
+    this.authService.declineFriendRequest(notification.requestId);
+  }
+  
 }

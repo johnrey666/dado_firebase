@@ -21,6 +21,7 @@ export class ProfileComponent implements OnInit {
   editingCommentIndex: number | null = null;
   comments: string[] = []; // Add this line
   isCurrentUser: boolean = false;
+  friendRequestSent: boolean = false;
   
 
   constructor(private authService: AuthService, private postService: PostService, private router: Router, private route: ActivatedRoute, private firestore: AngularFirestore) { }
@@ -33,6 +34,7 @@ export class ProfileComponent implements OnInit {
         console.log('User Data:', user);
         this.user = user;
         this.isCurrentUser = false;
+        console.log('this.user after getUserByEmail:', this.user);
         // Fetch the posts for this user
         this.userPosts = this.postService.getPost().filter(post => post.postedBy === user.email);
         // Retrieve the user's photoURL from the database
@@ -94,6 +96,7 @@ export class ProfileComponent implements OnInit {
         }
       );
     }
+
   }
 
   delete(index: number) {
@@ -138,5 +141,21 @@ export class ProfileComponent implements OnInit {
       // Refresh the comments
       this.userPosts[postIndex].comments = this.postService.getComments(postIndex);
     }
+  }
+
+  sendFriendRequest() {
+    console.log('this.user in sendFriendRequest:', this.user);
+    if (this.user && this.user.email) {
+      this.authService.sendFriendRequest(this.user.email);
+      this.friendRequestSent = true;
+
+    } else {
+      console.error('User or user Email is undefined');
+    }
+  }
+  cancelFriendRequest() {
+    this.authService.cancelFriendRequest(this.user.email).then(() => {
+      this.friendRequestSent = false;
+    });
   }
 }

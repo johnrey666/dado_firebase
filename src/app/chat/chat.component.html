@@ -3,20 +3,27 @@
 <div class="header">
     <h2>{{user?.email}}</h2>
   </div>
-<div class="container" *ngFor="let message of messages">
+  <div class="container" *ngFor="let message of messages">
     <div *ngIf="message.senderId !== currentUser.uid">
-      <img [src]="user.photoURL" alt="Avatar">
-      <p>{{message.content}}</p>
+      <img class="avatar" [src]="user.photoURL" alt="Avatar">
+      <div class="message-container">
+        <p>{{message.content}}</p>
+        <img *ngIf="message.fileUrl" [src]="message.fileUrl" alt="Uploaded file" class="message-image">
+      </div>
       <span class="time-right">{{message.timestamp | date:'shortTime'}}</span>
     </div>
     <div class="darker" *ngIf="message.senderId === currentUser.uid">
-      <img [src]="currentUser.photoURL" [class.right]="message.senderId === currentUser.uid" alt="Avatar">
-      <p>{{message.content}}</p>
+      <img class="avatar" [src]="currentUser.photoURL" [class.right]="message.senderId === currentUser.uid" alt="Avatar">
+      <div class="message-container">
+        <p>{{message.content}}</p>
+        <img *ngIf="message.fileUrl" [src]="message.fileUrl" alt="Uploaded file" class="message-image">
+      </div>
       <span class="time-right">{{message.timestamp | date:'shortTime'}}</span>
     </div>
-  </div>
+</div>
 
-  <div class="footer">
+  <div class="footer" >
+    <input type="file" (change)="onFileSelected($event)">
     <input [(ngModel)]="newMessageContent" placeholder="Type a message">
     <button (click)="sendMessage()">Send</button>
   </div>

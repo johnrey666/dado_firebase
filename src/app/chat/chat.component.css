@@ -7,6 +7,16 @@ body {
   align-items: center;
 }
 
+.chat-box {
+  width: 80%; /* adjust as needed */
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
 .header, .footer {
   display: flex;
   justify-content: center;
@@ -30,7 +40,7 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* ... rest of your CSS ... */
+
 
 .container > div {
   display: flex;
@@ -43,12 +53,7 @@ body {
   float: right;
 }
 
-.container img {
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
+
 
 .container p {
   margin: 0;
@@ -84,4 +89,23 @@ button {
 
 button:hover {
   background-color: #45a049;
+}
+
+.avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.message-container {
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .message-image {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 5%; 
+  border: 1px solid wheat;
 }
