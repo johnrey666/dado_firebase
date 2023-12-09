@@ -7,6 +7,8 @@ import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Observable, finalize } from 'rxjs';  
 import { StoryService } from '../story.service';
 import { map } from 'rxjs/operators'
+import { of } from 'rxjs';
+import { catchError, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-post-list',
@@ -101,7 +103,13 @@ export class PostListComponent implements OnInit {
       map(stories => {
         console.log('User:', user.uid, 'Stories:', stories);
         return stories.length > 0;
-      })
+      }),
+      catchError(error => {
+        console.error('Error in userHasStory:', error);
+        return of(false); // return false if there's an error
+      }),
+      take(1) // ensure the Observable completes after emitting a value
     );
   }
+  
 }
