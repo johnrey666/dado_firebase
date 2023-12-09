@@ -38,6 +38,7 @@ export class HeaderComponent implements OnInit {
   filteredUsers: any[] = [];
   users$: Observable<any[]>;
   allNotifications: { message: string; type: string; senderPhotoURL?: string;}[] = [];
+  currentUserEmail: string | null = null
 
   constructor(private fns: AngularFireFunctions, private backendservice: BackEndService, private postService: PostService, private darkModeService: DarkModeService, private authService: AuthService, private router: Router, private firestore: AngularFirestore, private chatService: ChatService, private cdr: ChangeDetectorRef) { // Inject ChatService
     this.searchKeyword = '';
@@ -51,10 +52,11 @@ export class HeaderComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const currentUser = this.authService.getCurrentUser();
+    
     this.authService.user$.subscribe(currentUser => {
       if (currentUser && currentUser.email) {
         console.log('Current user email:', currentUser.email);
+        this.currentUserEmail = currentUser.email;
         this.authService.getFriendRequestsForUser(currentUser.email).subscribe(friendRequests => {
           console.log('Received friend requests:', friendRequests);
           friendRequests.forEach(friendRequest => {
@@ -71,20 +73,23 @@ export class HeaderComponent implements OnInit {
         });
       }
     });
-
+  
     this.authService.getUsers().subscribe(users => {
       console.log('Users:', users);
       this.users = users;
-    
+  
       this.users.forEach(user => {
+        let currentUser = this.authService.getCurrentUser();
         if (currentUser) {
-            this.chatService.getUnreadMessagesCount(currentUser.uid, user.uid).subscribe(count => {
-                user.unreadMessagesCount = count;
-                this.cdr.detectChanges(); // manually trigger change detection
-            });
+          this.chatService.getUnreadMessagesCount(currentUser.uid, user.uid).subscribe(count => {
+            user.unreadMessagesCount = count;
+            this.cdr.detectChanges(); // manually trigger change detection
+          });
         }
+    
+      });
     });
-    });
+  
     this.firestore.collection('users').snapshotChanges().subscribe(users => {
       this.users = users.map(user => {
         const data = user.payload.doc.data() as any;
@@ -92,6 +97,7 @@ export class HeaderComponent implements OnInit {
         return { id, ...data };
       });
     });
+  
     this.backendservice.fetchData();
     this.postService.notificationCreated.subscribe((notification: {title: string, date: string, time: string}) => {
       this.onNewPostCreated(notification);

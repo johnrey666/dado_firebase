@@ -1,5 +1,19 @@
+<br><br><br>
+<div class="user-images" style="display: flex; flex-direction: row;">
+  <input type="file" (change)="onFileSelected($event)">
+  <div *ngFor="let user of users" style="text-align: center;">
+    <img [src]="user.photoURL ? user.photoURL : 'https://i.stack.imgur.com/l60Hf.png'" 
+         [style.border]="(userHasStory(user) | async) ? '2px solid blue' : 'none'" 
+         style="width: 70px; height: 70px; border-radius: 50%; margin-right: 20px;">
+    <p style="margin-right: 20px;">{{ user.lastName }}</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- Posts -->
 <ng-container *ngFor="let post of listOfPosts; let i=index">
-    <app-post [post]="post" [index]="i" [userPhotoURL]="user?.photoURL"></app-post>
+  <app-post [post]="post" [index]="i" [userPhotoURL]="user?.photoURL"></app-post>
 </ng-container>
 
 <!-- Display search results -->

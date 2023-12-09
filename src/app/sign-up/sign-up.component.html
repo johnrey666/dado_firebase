@@ -3,6 +3,14 @@
 <!-- login.component.html -->
 <form>
     <div class="user-box">
+        <input type="text" name="firstName" id="firstName" [(ngModel)]="firstName"> 
+        <label>First Name</label>
+    </div>
+    <div class="user-box">
+        <input type="text" name="lastName" id="lastName" [(ngModel)]="lastName"> 
+        <label>Last Name</label>
+    </div>
+    <div class="user-box">
         <input type="text" name="email" id="email" [(ngModel)]="email"> 
         <label>Email</label>
     </div>

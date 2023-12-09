@@ -57,7 +57,7 @@
   </div>
 </div>
 
-<button  routerLink="/profile" class="btn btn-link" style=" background: none; border: none;">
+<button [routerLink]="['/profile', currentUserEmail]" class="btn btn-link" style=" background: none; border: none;">
   <img src="../../assets/user.png" alt="profile" style="width: 24px; height: 24px;">
 </button>
 

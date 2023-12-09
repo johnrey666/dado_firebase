@@ -33,8 +33,13 @@ export class ProfileComponent implements OnInit {
       this.authService.getUserByEmail(email).subscribe(user => {
         console.log('User Data:', user);
         this.user = user;
-        this.isCurrentUser = false;
-        console.log('this.user after getUserByEmail:', this.user);
+        // Check if the user being viewed is the currently logged-in user
+        const currentUser = this.authService.getCurrentUser();
+        if (currentUser && currentUser.email === user.email) {
+          this.isCurrentUser = true;
+        } else {
+          this.isCurrentUser = false;
+        }
         // Fetch the posts for this user
         this.userPosts = this.postService.getPost().filter(post => post.postedBy === user.email);
         // Retrieve the user's photoURL from the database
@@ -42,7 +47,6 @@ export class ProfileComponent implements OnInit {
           this.user.photoURL = photoURL;
         });
         // Check if the current user and this user are friends
-        const currentUser = this.authService.getCurrentUser();
         if (currentUser) {
           this.authService.areFriends(currentUser.uid, user.uid).subscribe(areFriends => {
             this.areFriends = areFriends;
@@ -51,18 +55,18 @@ export class ProfileComponent implements OnInit {
       });
     } else {
       // Display the profile of the currently logged in user
-      this.user = this.authService.getCurrentUser();
-      this.isCurrentUser = true;
-      this.authService.user$.subscribe(user => {
-        if (user) {
-          this.userPosts = this.postService.getPost().filter(post => post.postedBy === user.email);
-          // Retrieve the user's photoURL from the database
-          this.authService.getUserPhotoURL(user.uid).then(photoURL => {
-            console.log('Photo URL:', photoURL);
-            this.user.photoURL = photoURL;
-          });
-        }
-      });
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser) {
+        this.user = currentUser;
+        this.isCurrentUser = true;
+        // Using the non-null assertion operator to assure TypeScript that currentUser is not null
+        this.userPosts = this.postService.getPost().filter(post => post.postedBy === currentUser.email);
+        // Retrieve the user's photoURL from the database
+        this.authService.getUserPhotoURL(currentUser.uid).then(photoURL => {
+          console.log('Photo URL:', photoURL);
+          this.user.photoURL = photoURL;
+        });
+      }
     }
   }
 

@@ -5,6 +5,15 @@ import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { Observable } from 'rxjs';
 import { EMPTY } from 'rxjs';
+
+import { User as FirebaseUser } from 'firebase/auth';
+
+export interface User extends FirebaseUser {
+  firstName: string;
+  lastName: string;
+}
+
+
 @Component({
   selector: 'app-post',
   templateUrl: './post.component.html',
@@ -13,6 +22,8 @@ import { EMPTY } from 'rxjs';
 export class PostComponent implements OnInit {
   user: any;
   user$: Observable<any> = EMPTY; // Declare user$ as an Observable and initialize with EMPTY
+  users: User[] = []; // Declare users array
+  
 
   memberName = "Lan";
   constructor(private postService: PostService, private router: Router, private authService: AuthService) {
@@ -35,6 +46,11 @@ export class PostComponent implements OnInit {
       }
     });
     this.comments = this.postService.getComments(this.index);
+
+    // Subscribe to getUsers() and assign the result to users
+    this.authService.getUsers().subscribe(users => {
+      this.users = users;
+    });
   }
   delete() {
     // Display a confirmation dialog

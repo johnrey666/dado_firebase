@@ -47,7 +47,7 @@ export class PostEditComponent implements OnInit {
       const description = this.form.value.description;
       const postedBy = user?.email || 'Anonymous'; // Get the email of the current user
       const post: Post = new Post(
-        id, title, imgPath, description, 'Dado', new Date(), 0, [], postedBy // Pass the email to the Post constructor
+        id,'', title, imgPath, description, 'Dado', new Date(), 0, [], postedBy // Pass the email to the Post constructor
       );
       if (this.editMode == true) {
         this.postService.updatePost(this.index, post);

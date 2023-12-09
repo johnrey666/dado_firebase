@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Observable } from 'rxjs';
+import { Observable, combineLatest } from 'rxjs';
 import { UserInfo  } from 'firebase/auth';
 import { map, take, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
@@ -11,6 +11,11 @@ import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { filter } from 'rxjs/operators';
+
+export interface AppUser extends User {
+  firstName: string;
+  lastName: string;
+}
 
 interface FriendRequest {
   senderEmail: string;
@@ -63,29 +68,26 @@ export class AuthService {
     }
   }
   
-  public async updateUserData(user: User | null) {
+  public async updateUserData(user: any) {
     if (user) {
-      const auth = getAuth();
-      const userAuth = auth.currentUser;
-      if (userAuth) {
-        await updateProfile(userAuth, {
-          photoURL: user.photoURL
-        }).then(() => {
-          console.log('Profile updated successfully');
-          this._user$.next(user);
-        }).catch((error) => {
-          console.error('Error updating profile:', error);
-        });
-      }
+      const userRef = this.firestore.doc(`users/${user.uid}`);
+      const data = {
+        uid: user.uid,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      };
+      return userRef.set(data, { merge: true });
     }
   }
 
   signUp(email: string, password: string) {
     return this.firebaseAuth.createUserWithEmailAndPassword(email, password).then((result) => {
-      return this.firestore.collection('users').doc(result.user?.uid).set({
+      this.firestore.collection('users').doc(result.user?.uid).set({
         email: result.user?.email,
         // Add any other user properties you need
       });
+      return result;
     });
   }
 
@@ -97,6 +99,7 @@ export class AuthService {
   getCurrentUser() {
     const auth = getAuth();
     return auth.currentUser;
+    
   }
 
   getUserPhotoURL(uid: string): Promise<string> {
@@ -142,12 +145,12 @@ export class AuthService {
     );
   }
 
-  getUsers(): Observable<User[]> {
-    return this.firestore.collection<User>('users').valueChanges().pipe(
+  getUsers(): Observable<AppUser[]> {
+    return this.firestore.collection<AppUser>('users').valueChanges().pipe(
       tap(users => console.log('Users from Firestore:', users))
     );
   }
-
+  
   sendFriendRequest(receiverEmail: string) {
     if (receiverEmail) {
       const currentUser = this.getCurrentUser();
@@ -256,7 +259,18 @@ export class AuthService {
   }
 
   
-
+  getFriends(userId: string): Observable<string[]> {
+    const friends1$ = this.firestore.collection('friends', ref => ref.where('userId1', '==', userId))
+      .valueChanges()
+      .pipe(map((friends: any[]) => friends.map((friend: any) => friend.userId1 === userId ? friend.userId2 : friend.userId1)));  
+    const friends2$ = this.firestore.collection('friends', ref => ref.where('userId2', '==', userId))
+      .valueChanges()
+      .pipe(map((friends: any[]) => friends.map((friend: any) => friend.userId1 === userId ? friend.userId2 : friend.userId1)));
+  
+    return combineLatest([friends1$, friends2$]).pipe(
+      map(([friends1, friends2]) => [...friends1, ...friends2])
+    );
+  }
   
 
   

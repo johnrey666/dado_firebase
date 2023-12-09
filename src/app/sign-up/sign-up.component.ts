@@ -11,19 +11,30 @@ import { AuthService } from '../auth.service';
 export class SignUpComponent {
   email: string;
   password: string;
+  firstName: string;
+  lastName: string;
 
   constructor(private authService: AuthService, private router: Router) {
     this.email = '';
     this.password = '';
+    this.firstName = '';
+    this.lastName = '';
   }
 
   signUp() {
-    this.authService.signUp(this.email, this.password).then(() => {
+    this.authService.signUp(this.email, this.password).then((result) => {
+      return this.authService.updateUserData({
+        uid: result.user?.uid,
+        email: result.user?.email,
+        firstName: this.firstName,
+        lastName: this.lastName
+      });
+    }).then(() => {
       this.router.navigate(['/login']);
       console.log(this.email)
     }).catch(error => {
       console.error('Error during sign up:', error);
-      alert('Sign up failed. Please try again.'); // display an alert
+      alert('Sign up failed. Please try again.');
     });
   }
 } 
