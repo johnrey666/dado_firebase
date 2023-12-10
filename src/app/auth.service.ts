@@ -12,9 +12,16 @@ import { from } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { filter } from 'rxjs/operators';
 
+export interface AppUser {
+
+
+  hasStory?: boolean; // Add this line
+  story?: string;
+}
 export interface AppUser extends User {
   firstName: string;
   lastName: string;
+  
 }
 
 interface FriendRequest {
@@ -99,6 +106,7 @@ export class AuthService {
   getCurrentUser() {
     const auth = getAuth();
     return auth.currentUser;
+    
     
   }
 
