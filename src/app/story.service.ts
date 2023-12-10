@@ -41,4 +41,8 @@ updateStory(story: Story) {
 
   this.firestore.collection('stories').doc(story.storyId).update(story);
 }
+
+deleteStory(storyId: string): Promise<void> {
+  return this.firestore.collection('stories').doc(storyId).delete();
+}
 }

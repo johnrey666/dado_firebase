@@ -5,6 +5,8 @@
     <i class="fa fa-plus"></i>
   </label>
   <input id="file-upload" type="file" (change)="onFileSelected($event, currentUser)" style="display: none;">
+  <!-- Camera button -->
+  <button class="camera-button" (click)="openCameraModal()"><i class="fa fa-camera"></i></button>
   <div *ngFor="let user of users" style="text-align: center;">
     <img class="pic" [src]="user.photoURL ? user.photoURL : 'https://i.stack.imgur.com/l60Hf.png'" 
          [style.border]="user.hasStory ? '4px solid blue' : 'none'" 
@@ -13,19 +15,41 @@
     <p style="margin-right: 20px;">{{ user.lastName }}</p>
   </div>
 </div>
+
+<!-- Camera Modal -->
+<div id="cameraModal" class="modal">
+  <div class="modal-content">
+    <video #videoElement autoplay></video>
+    <button (click)="capture()">Capture</button>
+    <canvas #canvasElement style="display: none;"></canvas>
+    <span class="close" (click)="closeCameraModal()">&times;</span>
+  </div>
+</div>
+
 <div id="myModal" class="modal">
   <!-- Modal content -->
-  <div class="modal-content">
+<div class="modal-content">
+  <div class="user-info-container">
     <div class="user-info">
-      <img *ngIf="selectedUser" [src]="selectedUser.photoURL" style="width: 50px; height: 50px; border-radius: 50%;" alt="User Profile Picture"> &nbsp;
-      <b></b><p *ngIf="selectedUser">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</p>
-    </div><br>
+      <img *ngIf="selectedUser" [src]="selectedUser.photoURL" alt="User Profile Picture">
+      <p *ngIf="selectedUser">{{ selectedUser.firstName }} {{ selectedUser.lastName }}</p>
+    </div>
+ 
+    <div class="dropdown">
+      <button class="delete-button" (click)="toggleDropdown()">...</button>
+      <div id="myDropdown" class="dropdown-content" [style.display]="dropdownVisible ? 'block' : 'none'">
+        <button *ngIf="selectedUserStories[currentStoryIndex]" class="delete-button delete-text" (click)="deleteStory(selectedUserStories[currentStoryIndex])">Delete</button>
+        </div>
+    </div>
+  </div>
+   
     <p class="timestamp" *ngIf="selectedUserStories[currentStoryIndex] && selectedUserStories[currentStoryIndex].timestamp">{{ getTimeDifference(selectedUserStories[currentStoryIndex].timestamp) }}</p>
     <img *ngIf="selectedUserStories[currentStoryIndex] && selectedUserStories[currentStoryIndex].mediaType === 'image'" [src]="selectedUserStories[currentStoryIndex]?.photoURL" alt="User Story">
     <video *ngIf="selectedUserStories[currentStoryIndex] && selectedUserStories[currentStoryIndex].mediaType === 'video'" [src]="selectedUserStories[currentStoryIndex]?.photoURL" autoplay muted loop></video>
         <button class="prev" (click)="previousStory()">&#8592;</button> <!-- Left arrow -->
     <button class="next" (click)="nextStory()">&#8594;</button> <!-- Right arrow -->
     <div *ngIf="selectedUserStories[currentStoryIndex]">
+      
       <button class="reaction-button" (click)="addReaction('like')"><i class="fas fa-thumbs-up" style="color: green;"></i></button>
       <span>{{selectedUserStories[currentStoryIndex].reactionsCount['like']}}</span>
       

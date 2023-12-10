@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Post } from '../post.model';
 import { PostService } from '../post.service';
 import { BackEndService } from '../back-end.service';
@@ -13,7 +13,6 @@ import $ from 'jquery';
 import { ChangeDetectorRef } from '@angular/core';
 import { Reaction } from '../reaction.model';
 
-
 type ReactionType = 'like' | 'unlike' | 'angry' | 'sad' | 'heart';
 interface Story {
   storyId: string;
@@ -23,6 +22,7 @@ interface Story {
   reactions: Reaction[];
   reactionsCount: { [key in ReactionType]: number };
 }
+
 @Component({
   selector: 'app-post-list',
   templateUrl: './post-list.component.html',
@@ -38,6 +38,10 @@ export class PostListComponent implements OnInit {
   selectedUserStories: Story[] = []; // Change this to an array
   isLoading: boolean = false;
   selectedUser: AppUser | null = null;
+  dropdownVisible = false;
+
+  @ViewChild('videoElement') videoElement!: ElementRef;
+    @ViewChild('canvasElement') canvasElement!: ElementRef;
 
   constructor(
     private postService: PostService,
@@ -148,6 +152,77 @@ export class PostListComponent implements OnInit {
     });
   }
 
+  openCameraModal(): void {
+    const video: HTMLVideoElement = this.videoElement.nativeElement;
+    if (navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+          video.srcObject = stream;
+          video.play();
+          (document.getElementById('cameraModal') as any).style.display = 'block';
+        })
+        .catch((err) => {
+          console.error("Error accessing camera: ", err);
+        });
+    }
+  }
+  
+  closeCameraModal(): void {
+    const video: HTMLVideoElement = this.videoElement.nativeElement;
+    const stream = video.srcObject as MediaStream;
+    const tracks = stream.getTracks();
+  
+    tracks.forEach(track => {
+      track.stop();
+    });
+  
+    video.srcObject = null;
+    (document.getElementById('cameraModal') as any).style.display = 'none';
+  }
+  
+  capture(): void {
+    const canvas: HTMLCanvasElement = this.canvasElement.nativeElement;
+    const context = canvas.getContext('2d');
+    const video: HTMLVideoElement = this.videoElement.nativeElement;
+    if (context !== null) {
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    }
+    const capturedImage = canvas.toDataURL('image/png');
+    const blob = this.dataURLToBlob(capturedImage);
+  
+    // Upload the captured image to Firebase storage
+    const filePath = `media/${new Date().getTime()}_captured_image.png`;
+    const fileRef = this.storage.ref(filePath);
+    const task = this.storage.upload(filePath, blob);
+  
+    task.percentageChanges().subscribe((percentage) => {
+      console.log(percentage);
+    });
+  
+    task.snapshotChanges().pipe(
+      finalize(() => fileRef.getDownloadURL().subscribe((url) => {
+        console.log(url);
+        const storyData = { userId: this.currentUser.uid, mediaType: 'image' };
+        this.storyService.createStory(storyData, url);        
+      }))
+    ).subscribe();
+  
+    // Close the camera modal
+    this.closeCameraModal();
+  }
+  
+  dataURLToBlob(dataurl: string): Blob {
+    const arr = dataurl.split(',');
+    const match = arr[0].match(/:(.*?);/);
+    const mime = match ? match[1] : '';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while(n--){
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+  }
   closeModal(): void {
     (document.getElementById('myModal') as any).style.display = 'none';
   }
@@ -211,5 +286,15 @@ export class PostListComponent implements OnInit {
         this.cdr.detectChanges();
       }
     }
+  }
+  deleteStory(story: Story): void {
+    this.storyService.deleteStory(story.storyId).then(() => {
+      console.log('Story deleted successfully');
+    }).catch(error => {
+      console.error('Error deleting story:', error);
+    });
+  }
+  toggleDropdown(): void {
+    this.dropdownVisible = !this.dropdownVisible;
   }
 }

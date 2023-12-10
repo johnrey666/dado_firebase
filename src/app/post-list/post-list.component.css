@@ -45,6 +45,26 @@
   .custom-file-upload:hover {
     background-color: #ddd;
   }
+
+  .camera-button {
+    display: inline-block;
+    padding: 10px;
+    cursor: pointer;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    text-align: center;
+    line-height: 50px;
+    font-size: 30px;
+    color: #aaa;
+    margin-right: 20px;
+    border: none;
+  }
+  
+  .camera-button:hover {
+    background-color: #ddd;
+  }
   
   .user-info {
     display: flex;
@@ -115,4 +135,61 @@
   .reaction-button:hover {
     color: #666; /* Change this to the color you want when the button is hovered */
   }
+
+/* ... (previous styles) */
+
+.user-info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Added to take full width */
+}
+
+.user-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* Added to vertically align content */
+}
+
+.user-info img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px; /* Adjust the margin to create space between image and text */
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  margin-top: -50px;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 70px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  padding: 12px 16px;
+  z-index: 1;
+  border-radius: 5px;
+}
+
+.delete-text {
+  color: red; /* Change the text color to red */
+  font-size: 16px; 
+}
+
+.dropdown-content a {
+  color: black;
+  text-decoration: none;
+  display: block;
+}
 
