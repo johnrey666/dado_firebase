@@ -13,4 +13,7 @@
         <button type="submit" (click)="signIn($event)">Sign In</button>
     </form><br>
     <p><a routerLink="/signup" style="text-decoration: underline;">Sign Up Here</a></p>
+    <button (click)="startCamera()">Use Face Recognition</button>
+    <video #videoElement width="320" height="200"></video>
+    <button (click)="capture()">Capture</button>
 </div>
