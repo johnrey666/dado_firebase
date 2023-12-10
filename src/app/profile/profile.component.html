@@ -12,8 +12,8 @@
                     <label class="file-label">
                       <img [src]="user?.photoURL || 'http://www.baytekent.com/wp-content/uploads/2016/12/facebook-default-no-profile-pic1.jpg'" alt="..." class="profile-pic">
                       <span class="upload-icon" *ngIf="isCurrentUser">&#8593;</span>
-                      <input type="file" (change)="onFileSelected($event)" *ngIf="isCurrentUser">
-                      <button (click)="onUpload()" *ngIf="isCurrentUser">Upload</button>
+                      <input type="file" (change)="previewImage($event)" *ngIf="isCurrentUser">
+                      <button class="btn btn-primary" (click)="onUpload()" *ngIf="isCurrentUser">Upload</button>
                     </label>
                     <button class="friend-button" *ngIf="!friendRequestSent && !isCurrentUser && !areFriends" (click)="sendFriendRequest()"><i class="fas fa-plus"></i> Add Friend</button>
                     <button class="cancel-button" *ngIf="friendRequestSent && !isCurrentUser && !areFriends" (click)="cancelFriendRequest()"><i class="fas fa-times"></i> Cancel Friend Request</button>
@@ -53,13 +53,13 @@
                         </div>
                       </div><br>
                       <input #commentInput type="text" class="form-control" placeholder="comment" />
-                      <br /><button class="addcom" type="submit">Add Comment</button>
+                      <button class="btn btn-primary addcom" type="submit">Add Comment</button>
                     </form>
                     <hr>
                   
                     <div class="button-container">
-                      <button class="edit" (click)="onEdit(i)">Edit</button> |
-                      <button class="delete" (click)="delete(i)">Delete</button>
+                      <button class="btn btn-warning edit" (click)="onEdit(i)">Edit</button> |
+                      <button class="btn btn-danger delete" (click)="delete(i)">Delete</button>
                     </div>
                   <br><br>
                     <div class="auto">

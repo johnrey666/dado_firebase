@@ -24,13 +24,14 @@
       </div>
     </div><br>
     <input #commentInput type="text" class="form-control" placeholder="comment" />
-    <br /><button class="addcom" type="submit">Add Comment</button>
+    <br /><button class="btn btn-primary addcom" type="submit">Add Comment</button>
   </form>
   <hr>
 
   <div class="button-container">
-    <button class="edit" (click)="onEdit()">Edit</button> |
-    <button class="delete" (click)="delete()">Delete</button>
+    
+    <button class="btn btn-warning edit"  (click)="onEdit()">Edit</button> |
+    <button class="btn btn-danger delete" (click)="delete()">Delete</button>
   </div>
 <br><br>
 <div class ="auto">

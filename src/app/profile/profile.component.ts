@@ -168,4 +168,11 @@ export class ProfileComponent implements OnInit {
       this.friendRequestSent = false;
     });
   }
+  previewImage(event: any) {
+    if (event.target.files && event.target.files[0]) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => this.user.photoURL = e.target.result;
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  }
 }
