@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable, OperatorFunction, combineLatest } from 'rxjs';
 import { UserInfo  } from 'firebase/auth';
 import { map, take, tap } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
@@ -17,6 +17,7 @@ export interface AppUser {
 
   hasStory?: boolean; // Add this line
   story?: string;
+  status: string;
 }
 export interface AppUser extends User {
   firstName: string;
@@ -106,7 +107,7 @@ export class AuthService {
   getCurrentUser() {
     const auth = getAuth();
     return auth.currentUser;
-    
+      
     
   }
 
@@ -281,5 +282,13 @@ export class AuthService {
   }
   
 
+  updateUserStatus(userId: string, status: string): Promise<void> {
+    return this.firestore.collection('users').doc(userId).update({ status: status });  }
+
+    getUser(userId: string): Observable<AppUser> {
+      return this.firestore.collection('users').doc<AppUser>(userId).valueChanges().pipe(
+        filter(user => !!user) as OperatorFunction<AppUser | undefined, AppUser>
+      );
+    }
   
 }

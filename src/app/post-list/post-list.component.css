@@ -192,4 +192,61 @@
   text-decoration: none;
   display: block;
 }
+.input-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none; /* Remove border */
+}
 
+.input-wrapper {
+  position: relative;
+  flex-grow: 1;
+}
+
+.input-group .form-control {
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding-right: 30px; /* Make space for the icon */
+}
+
+.input-group .fa {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  border: none; /* Remove border */
+  color: #4CAF50; /* Add color */
+}
+
+/* Style for the "+" button */
+.fa-plus {
+  color: #4CAF50; /* Green color */
+  border: none;
+}
+
+/* Style for the check icon */
+.fa-check {
+  border: none !important; /* The !important rule gives this rule higher priority */
+}
+
+.add{
+  color: #4CAF50; /* Green color */
+  border: none;
+  background: none;
+}
+
+.user-status {
+  position: absolute;
+  top: -20px; /* Adjust this value to position the dialog box above the user's profile */
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  text-align: center;
+
+}

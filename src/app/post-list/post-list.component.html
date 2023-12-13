@@ -7,12 +7,22 @@
   <input id="file-upload" type="file" (change)="onFileSelected($event, currentUser)" style="display: none;">
   <!-- Camera button -->
   <button class="camera-button" (click)="openCameraModal()"><i class="fa fa-camera"></i></button>
-  <div *ngFor="let user of users" style="text-align: center;">
+  <div *ngFor="let user of users" style="text-align: center; position: relative;">
+    <div *ngIf="currentUser.uid === user.uid && userStatus" class="user-status">{{ userStatus }}</div>
     <img class="pic" [src]="user.photoURL ? user.photoURL : 'https://i.stack.imgur.com/l60Hf.png'" 
          [style.border]="user.hasStory ? '4px solid blue' : 'none'" 
          style="width: 70px; height: 70px; border-radius: 50%; margin-right: 20px;"
          (click)="user.hasStory && openModal(user)">
     <p style="margin-right: 20px;">{{ user.lastName }}</p>
+    <div *ngIf="currentUser.uid === user.uid" style="position: absolute; top: 0; right: 0;">
+      <button class="add" (click)="showTextBox = !showTextBox"><i class="fa fa-plus" ></i></button>
+      <div class="input-group">
+        <div class="input-wrapper">
+          <input *ngIf="showTextBox" [(ngModel)]="userStatus" (blur)="showTextBox = false" (keydown.enter)="updateUserStatus(user, userStatus)" class="form-control">
+          <i *ngIf="showTextBox" class="fa fa-check" (click)="updateUserStatus(user, userStatus)"></i>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 

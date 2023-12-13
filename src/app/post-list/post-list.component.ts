@@ -39,6 +39,8 @@ export class PostListComponent implements OnInit {
   isLoading: boolean = false;
   selectedUser: AppUser | null = null;
   dropdownVisible = false;
+  showTextBox = false;
+  userStatus: string;
 
   @ViewChild('videoElement') videoElement!: ElementRef;
     @ViewChild('canvasElement') canvasElement!: ElementRef;
@@ -52,6 +54,7 @@ export class PostListComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) { 
     this.currentUser = this.authService.getCurrentUser(); 
+    this.userStatus = '';
   }
 
   ngOnInit(): void {
@@ -71,6 +74,14 @@ export class PostListComponent implements OnInit {
   
     this.postService.listChangedEvent.subscribe((posts: Post[]) => {
       this.listOfPosts = posts;
+    });
+  
+    this.authService.user$.subscribe(user => {
+      if (user) {
+        this.authService.getUser(user.uid).subscribe(dbUser => {
+          this.userStatus = dbUser.status;
+        });
+      }
     });
   }
 
@@ -296,5 +307,13 @@ export class PostListComponent implements OnInit {
   }
   toggleDropdown(): void {
     this.dropdownVisible = !this.dropdownVisible;
+  }
+  updateUserStatus(user: AppUser, status: string): void {
+    // Update the user's status in your database
+    this.authService.updateUserStatus(user.uid, status).then(() => {
+      console.log('User status updated successfully');
+    }).catch(error => {
+      console.error('Error updating user status:', error);
+    });
   }
 }
