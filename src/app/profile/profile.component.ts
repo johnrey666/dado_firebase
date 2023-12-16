@@ -97,7 +97,7 @@ export class ProfileComponent implements OnInit {
         () => {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             console.log('File available at', downloadURL);
-            this.user = { ...this.user, photoURL: downloadURL };
+            this.user.photoURL = downloadURL;
             // Save the user's data with the new photoURL
             this.authService.updateUserData(this.user);
             // Save the photoURL in Firestore
@@ -105,8 +105,9 @@ export class ProfileComponent implements OnInit {
           });
         }
       );
+    } else {
+      console.error('No file selected for upload');
     }
-
   }
 
   delete(index: number) {
@@ -172,7 +173,10 @@ export class ProfileComponent implements OnInit {
     if (event.target.files && event.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (e: any) => this.user.photoURL = e.target.result;
-      reader.readAsDataURL(event.target.files[0]);
+      this.selectedFile = event.target.files[0]; // Add this line
+      if (this.selectedFile) {
+        reader.readAsDataURL(this.selectedFile);
+    }
     }
   }
 }

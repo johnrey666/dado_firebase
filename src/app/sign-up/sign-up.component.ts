@@ -37,4 +37,12 @@ export class SignUpComponent {
       alert('Sign up failed. Please try again.');
     });
   }
+  togglePasswordVisibility(inputId: string): void {
+    const inputElement = document.getElementById(inputId) as HTMLInputElement;
+    if (inputElement.type === 'password') {
+      inputElement.type = 'text';
+    } else {
+      inputElement.type = 'password';
+    }
+  }
 } 

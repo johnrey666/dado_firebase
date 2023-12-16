@@ -20,6 +20,8 @@ import { NoAuthGuard } from './noauth.guard';
 import { ProfileComponent } from './profile/profile.component'; // import NoAuthGuard
 import { Ng2SearchPipe } from 'ng2-search-filter';
 import { ChatComponent } from './chat/chat.component';
+import { VideoCallComponent } from './video-call/video-call.component';
+import { Chat1Component } from './chat1/chat1.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'post-list', pathMatch: 'full' },
@@ -35,7 +37,8 @@ const routes: Routes = [
   { path: 'profile/:email', component: ProfileComponent },
   { path: 'chat/:userId', component: ChatComponent },
   { path: 'chat/:currentUserUid/:userId', component: ChatComponent },
-  { path: 'chat', component: ChatComponent }
+  { path: 'chat', component: ChatComponent },
+  { path: 'video-call', component: VideoCallComponent }
 ]
 
 @NgModule({
@@ -50,7 +53,9 @@ const routes: Routes = [
     SignUpComponent,
     SignInComponent,
     ProfileComponent,
-    ChatComponent
+    ChatComponent,
+    VideoCallComponent,
+    Chat1Component
   ],
   imports: [
     BrowserModule,

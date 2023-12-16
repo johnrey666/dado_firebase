@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
+import { SignalingService } from '../signaling.service';
 
 @Component({
   selector: 'app-login',
@@ -11,7 +12,7 @@ export class SignInComponent implements AfterViewInit {
   @ViewChild('videoElement') videoElement!: ElementRef;  email: string;
   password: string;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private router: Router, private signalingService: SignalingService) {
     this.email = '';
     this.password = '';
   }
@@ -59,6 +60,8 @@ export class SignInComponent implements AfterViewInit {
     event.preventDefault();
     this.authService.login(this.email, this.password).then((user) => {
       if (user) {
+        // User is authenticated, start the call
+        this.signalingService.startCall(user.uid);
         this.router.navigate(['/post-list'])
           .then(success => console.log('Navigation success:', success))
           .catch(error => console.log('Navigation error:', error));
@@ -70,4 +73,13 @@ export class SignInComponent implements AfterViewInit {
       alert('Incorrect username or password');
     });
   }
+  togglePasswordVisibility(inputId: string): void {
+    const inputElement = document.getElementById(inputId) as HTMLInputElement;
+    if (inputElement.type === 'password') {
+      inputElement.type = 'text';
+    } else {
+      inputElement.type = 'password';
+    }
+  }
+
 }

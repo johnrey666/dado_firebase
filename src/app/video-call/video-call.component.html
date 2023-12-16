@@ -1,0 +1,28 @@
+<br><br><br>
+<div class="users-list">
+    <div *ngFor="let user of users">
+      <span>{{ user.firstName }} {{ user.lastName }}</span>
+      <button (click)="startCall(user)">Call</button>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" tabindex="-1" [style.display]="isCallStarted ? 'block' : 'none'">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Video Call</h5>
+        <button type="button" class="btn-close" (click)="endCall()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="video-call-container">
+          <video #localVideo autoplay muted></video>
+          <video #remoteVideo autoplay></video>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="endCall()">End Call</button>
+      </div>
+    </div>
+  </div>
+</div>
