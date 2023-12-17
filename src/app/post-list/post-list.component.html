@@ -7,8 +7,9 @@
   <input id="file-upload" type="file" (change)="onFileSelected($event, currentUser)" style="display: none;">
   <!-- Camera button -->
   <button class="camera-button" (click)="openCameraModal()"><i class="fa fa-camera"></i></button>
-  <div *ngFor="let user of users" style="text-align: center; position: relative;">
+  <div *ngFor="let user of users$ | async" style="text-align: center; position: relative;">
     <div *ngIf="currentUser.uid === user.uid && userStatus" class="user-status">{{ userStatus }}</div>
+    <div *ngIf="user.userStatus" class="user-status">{{ user.userStatus }}</div>
     <img class="pic" [src]="user.photoURL ? user.photoURL : 'https://i.stack.imgur.com/l60Hf.png'" 
          [style.border]="user.hasStory ? '4px solid blue' : 'none'" 
          style="width: 70px; height: 70px; border-radius: 50%; margin-right: 20px;"

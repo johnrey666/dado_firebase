@@ -6,7 +6,7 @@ import { AuthService, AppUser } from '../auth.service';
 import { AngularFireStorage } from '@angular/fire/compat/storage';
 import { Observable, finalize } from 'rxjs';  
 import { StoryService } from '../story.service';
-import { map } from 'rxjs/operators'
+import { map, tap } from 'rxjs/operators'
 import { of } from 'rxjs';
 import { catchError, take } from 'rxjs/operators';
 import $ from 'jquery';
@@ -21,6 +21,8 @@ interface Story {
   mediaType: string;
   reactions: Reaction[];
   reactionsCount: { [key in ReactionType]: number };
+  
+  
 }
 
 @Component({
@@ -32,7 +34,7 @@ export class PostListComponent implements OnInit {
   listOfPosts: Post[] = [];
   searchResults: Post[] = [];
   user: any;
-  users: AppUser[] = [];
+  users$: Observable<AppUser[]> = of([]);
   currentUser: any;
   currentStoryIndex: number = 0;
   selectedUserStories: Story[] = []; // Change this to an array
@@ -40,33 +42,37 @@ export class PostListComponent implements OnInit {
   selectedUser: AppUser | null = null;
   dropdownVisible = false;
   showTextBox = false;
-  userStatus: string;
+  userStatus: string = '';
 
   @ViewChild('videoElement') videoElement!: ElementRef;
     @ViewChild('canvasElement') canvasElement!: ElementRef;
 
-  constructor(
-    private postService: PostService,
-    private backEndService: BackEndService,
-    private authService: AuthService,
-    private storage: AngularFireStorage,
-    private storyService: StoryService,
-    private cdr: ChangeDetectorRef
-  ) { 
-    this.currentUser = this.authService.getCurrentUser(); 
-    this.userStatus = '';
-  }
-
-  ngOnInit(): void {
-    this.authService.getUsers().subscribe(users => {
-      this.users = users;
-  
-      this.users.forEach(user => {
-        this.userHasStory(user).subscribe(hasStory => {
-          user.hasStory = hasStory;
+    constructor(
+      private postService: PostService,
+      private backEndService: BackEndService,
+      private authService: AuthService,
+      private storage: AngularFireStorage,
+      private storyService: StoryService,
+      private cdr: ChangeDetectorRef
+    ) { 
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser) {
+        this.authService.getUser(currentUser.uid).subscribe(user => {
+          this.currentUser = user;
+          this.userStatus = user.status;
         });
-      });
-    });
+      }
+    }
+    ngOnInit(): void {
+      this.users$ = this.authService.getUsers().pipe(
+        tap(users => {
+          users.forEach(user => {
+            this.userHasStory(user).subscribe(hasStory => {
+              user.hasStory = hasStory;
+            });
+          });
+        })
+      );
   
     this.backEndService.fetchData().subscribe((posts: Post[])=> {
       this.listOfPosts = posts;
@@ -75,11 +81,10 @@ export class PostListComponent implements OnInit {
     this.postService.listChangedEvent.subscribe((posts: Post[]) => {
       this.listOfPosts = posts;
     });
-  
     this.authService.user$.subscribe(user => {
       if (user) {
         this.authService.getUser(user.uid).subscribe(dbUser => {
-          this.userStatus = dbUser.status;
+          this.userStatus = dbUser.status; // Set the status to the fetched status
         });
       }
     });
@@ -312,6 +317,8 @@ export class PostListComponent implements OnInit {
     // Update the user's status in your database
     this.authService.updateUserStatus(user.uid, status).then(() => {
       console.log('User status updated successfully');
+      // Update the userStatus property of the user object in the component's local state
+      user.userStatus = status;
     }).catch(error => {
       console.error('Error updating user status:', error);
     });

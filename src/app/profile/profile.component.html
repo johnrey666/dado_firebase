@@ -1,3 +1,5 @@
+
+
 <div class="row py-5 px-4"> 
   <div class="col-md-5 mx-auto">
       <!-- Profile widget --> 
@@ -25,48 +27,21 @@
           </div> 
           <div class="py-4 px-4"> 
               <div class="d-flex align-items-center justify-content-between mb-3"> 
-                  <h5 class="mb-0">Posts</h5>
-              </div> 
+                  <button (click)="showStoryArchive = false" style="z-index: 1;">Posts</button>
+                  <button style="background-color: red; z-index: 1;" (click)="showStoryArchive = !showStoryArchive; fetchExpiredStories()">Story Archive</button>              </div> 
               <!-- Display posts -->
-              <div *ngFor="let post of userPosts; let i = index">
-                  <br><br><br>
-                  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-                  
-                  <section class="post custom-post-section">
-                    <p>Posted by: {{ post?.postedBy }}</p>
-                      <h2 [innerHTML]="(post?.title ?? '') | highlight:searchTerm"></h2>
-                    <img [src]="post?.imgPath" style="height: 300px; width: 500px; border-radius: 5px;">
-                    <h3 [innerHTML]="(post?.description ?? '') | highlight:searchTerm"></h3>
-                    <p>
-                      <button type="button" (click)="onLike(i)" style="background: none; text-decoration: none; font-size: 24px; color: red; border: none;" class="far fa-heart"></button>&nbsp;{{ post?.numberOfLikes }}
-                    </p>
-                    <!-- Comment Section -->
-                    <form (ngSubmit)="onAddComment(i, commentInput.value)">
-                      <label class="font-weight-bold">Comments</label>
-                      <div *ngFor="let comment of post?.comments; let j = index">
-                        Stranger: {{ comment }}
-                        <button *ngIf="editingCommentIndex !== j" (click)="onEditComment(j)" style="border: none; color: blue;"><i class="fas fa-edit"></i></button>
-                        <button (click)="onDeleteComment(i, j)" style="border: none; color: red;"><i class="fas fa-trash"></i></button>
-                        <div *ngIf="editingCommentIndex === j">
-                          <input #newCommentInput type="text" [value]="comment" />
-                          <button (click)="onSaveComment(i, j, newCommentInput.value)" style="border: none; color: green;"><i class="fas fa-save"></i></button>
-                        </div>
-                      </div><br>
-                      <input #commentInput type="text" class="form-control" placeholder="comment" />
-                      <button class="btn btn-primary addcom" type="submit">Add Comment</button>
-                    </form>
-                    <hr>
-                  
-                    <div class="button-container">
-                      <button class="btn btn-warning edit" (click)="onEdit(i)">Edit</button> |
-                      <button class="btn btn-danger delete" (click)="delete(i)">Delete</button>
-                    </div>
-                  <br><br>
-                    <div class="auto">
-                    <p>Author: {{ post?.author }}</p>
-                    <p>Date: {{ post?.dateCreated | date }}</p>
-                    </div>
-                  </section><hr>
+              <div *ngIf="!showStoryArchive">
+                <ng-container *ngFor="let post of userPosts; let i=index">
+                  <app-post [post]="post" [index]="i" [userPhotoURL]="user?.photoURL"></app-post>
+                </ng-container>
+              </div>
+        
+              <!-- Display expired stories -->
+              <div *ngIf="showStoryArchive" class="story-archive">   <hr>
+                <div *ngFor="let story of expiredStories">
+                  <!-- Display the story -->
+                  <img [src]="story.photoURL" alt="Story Image" class="story-image">
+                </div>
               </div>
           </div> 
       </div> 

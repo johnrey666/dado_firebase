@@ -18,7 +18,7 @@ wss.on('connection', ws => {
         return;
     }
       
-    if (data.type === 'offer' || data.type === 'answer' || data.type === 'ice-candidate') {
+    if (data.type === 'offer' || data.type === 'answer' || data.type === 'ice-candidate' || data.type === 'call-request') {
         const recipientWs = users.get(data.user);
         console.log('Received message for user:', data.user);
         console.log('Users:', users);

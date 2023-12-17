@@ -6,6 +6,15 @@ import { finalize } from 'rxjs/operators';
 import { Post } from '../post.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import { StoryService } from '../story.service';
+
+export interface Story {
+  storyId: string;
+  id: string;
+  photoURL: string; // Add this line
+}
+
+
 
 @Component({
   selector: 'app-profile',
@@ -23,8 +32,10 @@ export class ProfileComponent implements OnInit {
   isCurrentUser: boolean = false;
   friendRequestSent: boolean = false;
   areFriends: boolean = false;
+  showStoryArchive: boolean = false;
+  expiredStories: Story[] = [];
 
-  constructor(private authService: AuthService, private postService: PostService, private router: Router, private route: ActivatedRoute, private firestore: AngularFirestore) { }
+  constructor(private authService: AuthService, private postService: PostService, private router: Router, private route: ActivatedRoute, private firestore: AngularFirestore, private storyService: StoryService) { }
 
   ngOnInit(): void {
     const email = this.route.snapshot.paramMap.get('email');
@@ -52,6 +63,18 @@ export class ProfileComponent implements OnInit {
             this.areFriends = areFriends;
           });
         }
+        // Fetch expired stories for the user
+        this.storyService.getExpiredStoriesByUser(user.uid).subscribe(storiesData => {
+          console.log(storiesData); // Add this line to log the data
+          this.expiredStories = storiesData.map(story => {
+            return {
+              storyId: story.storyId,
+              photoURL: story.photoURL,
+              id: story.id,
+
+            }
+          });
+        });
       });
     } else {
       // Display the profile of the currently logged in user
@@ -65,6 +88,16 @@ export class ProfileComponent implements OnInit {
         this.authService.getUserPhotoURL(currentUser.uid).then(photoURL => {
           console.log('Photo URL:', photoURL);
           this.user.photoURL = photoURL;
+        });
+        // Fetch expired stories for the user
+        this.storyService.getExpiredStoriesByUser(currentUser.uid).subscribe(stories => {
+          this.expiredStories = stories.map(story => {
+            return {
+              storyId: story.storyId,
+              photoURL: story.photoURL, // Add this line
+              id: story.id,
+            }
+          });
         });
       }
     }
@@ -179,4 +212,16 @@ export class ProfileComponent implements OnInit {
     }
     }
   }
+  fetchExpiredStories() {
+    console.log('fetchExpiredStories() called'); // Add this line
+    this.storyService.getExpiredStoriesByUser(this.user.uid).subscribe(stories => {
+      console.log('Fetched stories:', stories); // Add this line
+      this.expiredStories = stories;
+      this.showStoryArchive = true;
+      console.log('showStoryArchive after fetching stories:', this.showStoryArchive);
+    });
+  }
+
+  
+
 }

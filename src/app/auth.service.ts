@@ -18,6 +18,7 @@ export interface AppUser {
   hasStory?: boolean; // Add this line
   story?: string;
   status: string;
+  userStatus?: string;
 }
 export interface AppUser extends User {
   firstName: string;

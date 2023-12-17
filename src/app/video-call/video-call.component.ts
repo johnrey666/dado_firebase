@@ -11,6 +11,7 @@ export class VideoCallComponent implements OnInit {
   @ViewChild('localVideo') localVideo!: ElementRef;
   @ViewChild('remoteVideo') remoteVideo!: ElementRef;
   users: any[] = [];
+  currentUser: any; // Define the currentUser property
 
   private localStream: MediaStream | null = null;
   private remoteStream: MediaStream | null = null;
@@ -58,9 +59,23 @@ export class VideoCallComponent implements OnInit {
         await this.peerConnection.setRemoteDescription(answer);
       }
     });
+  
+    this.signalingService.callRequestReceived.subscribe(async (request) => {
+      if (confirm('You have received a call from ' + request.callingUser + '. Do you want to accept it?')) {
+        // User accepted the call. Start the call here.
+        this.startCall(request.callingUser);
+      } else {
+        // User declined the call. Send a "call-declined" message to the calling user.
+        this.signalingService.sendCallDeclined(request.callingUser, this.currentUser.id);
+      }
+    });
   }
 
   async startCall(user: any)  {
+    if (!user) {
+      console.error('User is undefined');
+      return;
+    }
     console.log('startCall called by', this, 'Calling user with ID:', user.uid);
     try {
       this.localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
